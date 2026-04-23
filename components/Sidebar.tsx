@@ -3,7 +3,8 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Conversation } from '@/types/conversation'
 import { useTheme } from '@/components/theme/ThemeProvider'
-import { supabase } from '@/lib/supabase'
+import { conversationService, realtimeService } from '@/lib/db'
+import { CONVERSATION_FIELDS } from '@/lib/constants'
 
 interface SidebarProps {
   selectedConversation: Conversation | null
@@ -18,26 +19,18 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
   const { theme, toggleTheme, mounted } = useTheme()
   const isDarkMode = theme === 'dark'
 
-  // Fetch conversations from Supabase
+  // Fetch conversations from the service
   const fetchConversations = async (isSilent = false) => {
     if (!isSilent) {
       setError(null)
     }
     try {
-      const { data, error: supabaseError } = await supabase
-        .from('conversaciones')
-        .select('*')
-        .order('creado_en', { ascending: false })
-      
-      if (supabaseError) {
-        throw supabaseError
-      }
-      
-      setConversations(data || [])
-    } catch (err: any) {
+      const data = await conversationService.getAll()
+      setConversations(data)
+    } catch (err: unknown) {
       console.error('Error fetching conversations:', err)
       if (!isSilent) {
-        setError(err.message || 'Error al cargar conversaciones')
+        setError(err instanceof Error ? err.message : 'Error al cargar conversaciones')
       }
     } finally {
       if (!isSilent) {
@@ -50,24 +43,13 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
     fetchConversations(false) // Initial load with loading state
 
     // Realtime subscription for conversations
-    const channel = supabase
-      .channel('conversations-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversaciones'
-        },
-        () => {
-          // Silent refresh - no loading spinner
-          fetchConversations(true)
-        }
-      )
-      .subscribe()
+    const channel = realtimeService.onConversationsChange(() => {
+      // Silent refresh - no loading spinner
+      fetchConversations(true)
+    })
 
     return () => {
-      supabase.removeChannel(channel)
+      // Clean up is handled by the service internally
     }
   }, [])
 

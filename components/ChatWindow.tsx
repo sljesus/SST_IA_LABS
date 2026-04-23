@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Conversation } from '@/types/conversation'
-import { Message } from '@/types/message'
+import { Message, SenderType } from '@/types/message'
 import { useTheme } from '@/components/theme/ThemeProvider'
+import { messageService, realtimeService } from '@/lib/db'
+import { SENDER_TYPES, isAgentMessage, detectSenderType } from '@/lib/constants'
 
 interface Props {
   conversation: Conversation | null
@@ -32,26 +33,12 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   useEffect(() => {
     if (!conversation) return
 
-    const channel = supabase
-      .channel(`conversation-${conversation.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'conversaciones',
-          filter: `id=eq.${conversation.id}`
-        },
-        (payload) => {
-          if (payload.new && 'isActive' in payload.new) {
-            setAiMode(payload.new.isActive)
-          }
-        }
-      )
-      .subscribe()
+    const channel = realtimeService.onConversationUpdate(conversation.id, (updated) => {
+      setAiMode(updated.isActive)
+    })
 
     return () => {
-      supabase.removeChannel(channel)
+      // Clean up is handled by the service internally
     }
   }, [conversation?.id])
 
@@ -70,60 +57,26 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   useEffect(() => {
     if (conversation) {
       const fetchMessages = async () => {
-        const { data } = await supabase
-          .from('mensajes')
-          .select('*')
-          .eq('conversacion_id', conversation.id)
-          .order('creado_en', { ascending: true })
-        setMessages(data || [])
+        const data = await messageService.getByConversationId(conversation.id)
+        setMessages(data)
         setTimeout(scrollToBottom, 100)
       }
       fetchMessages()
 
       // Realtime subscription for messages
-      const channel = supabase
-        .channel(`messages-${conversation.id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'mensajes',
-            filter: `conversacion_id=eq.${conversation.id}`
-          },
-          (payload) => {
-            if (payload.new) {
-              setMessages(prev => {
-                // Avoid duplicates
-                if (prev.some(m => m.id === payload.new.id)) return prev
-                return [...prev, payload.new as Message].sort(
-                  (a, b) => new Date(a.creado_en).getTime() - new Date(b.creado_en).getTime()
-                )
-              })
-              setTimeout(scrollToBottom, 100)
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'mensajes',
-            filter: `conversacion_id=eq.${conversation.id}`
-          },
-          (payload) => {
-            if (payload.new) {
-              setMessages(prev =>
-                prev.map(m => m.id === payload.new.id ? payload.new as Message : m)
-              )
-            }
-          }
-        )
-        .subscribe()
+      const channel = realtimeService.onMessagesChange(conversation.id, (newMessage) => {
+        setMessages(prev => {
+          // Avoid duplicates
+          if (prev.some(m => m.id === newMessage.id)) return prev
+          return [...prev, newMessage].sort(
+            (a, b) => new Date(a.creado_en).getTime() - new Date(b.creado_en).getTime()
+          )
+        })
+        setTimeout(scrollToBottom, 100)
+      })
 
       return () => {
-        supabase.removeChannel(channel)
+        // Clean up is handled by the service internally
       }
     }
   }, [conversation])
@@ -140,16 +93,7 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
 
     try {
       // Save to database
-      const { error: dbError } = await supabase.from('mensajes').insert({
-        conversacion_id: conversation.id,
-        remitente: 'agente',
-        contenido: messageContent
-      })
-
-      if (dbError) {
-        console.error('Database error:', dbError)
-        return
-      }
+      await messageService.send(conversation.id, messageContent)
 
       // Send to WhatsApp
       const response = await fetch('/api/whatsapp/send', {
@@ -161,12 +105,8 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
       if (response.ok) {
         setNewMessage('')
         // Refresh messages
-        const { data } = await supabase
-          .from('mensajes')
-          .select('*')
-          .eq('conversacion_id', conversation.id)
-          .order('creado_en', { ascending: true })
-        setMessages(data || [])
+        const data = await messageService.getByConversationId(conversation.id)
+        setMessages(data)
       } else {
         console.error('WhatsApp API error:', await response.text())
       }
@@ -317,36 +257,45 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
           </span>
         </div>
         {/* Filtrar mensajes según searchQuery */}
-        {(searchQuery ? messages.filter(m => m.contenido.toLowerCase().includes(searchQuery.toLowerCase())) : messages).map(msg => (
-          <div
-            key={msg.id}
-            className={`flex flex-col ${msg.remitente === 'cliente' ? 'items-start' : 'items-end'} max-w-[70%]`}
-          >
-            <div className="px-3 py-2 rounded-tr-xl rounded-br-xl rounded-bl-xl" style={{ 
-              backgroundColor: msg.remitente === 'cliente' 
-                ? (isDarkMode ? '#1e2830' : '#ffffff') 
-                : (isDarkMode ? '#005c4b' : '#dcf8c6'),
-              color: textPrimary
-            }}>
-              <p className="font-chat-text text-chat-text">{msg.contenido}</p>
-              <div className={`flex justify-end mt-1 ${msg.remitente === 'cliente' ? '' : 'items-center gap-1'}`}>
-                <span className="text-[11px]" style={{ color: textSecondary }}>
-                  {(() => {
-                    const date = new Date(msg.creado_en)
-                    const hours = date.getHours().toString().padStart(2, '0')
-                    const minutes = date.getMinutes().toString().padStart(2, '0')
-                    return `${hours}:${minutes}`
-                  })()}
-                </span>
-                {msg.remitente === 'agente' && (
-                  <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    done_all
+        {(searchQuery ? messages.filter(m => m.contenido.toLowerCase().includes(searchQuery.toLowerCase())) : messages).map(msg => {
+          // Scalable sender detection: use sender_type if available, fallback to legacy detection
+          const senderType = msg.sender_type ?? detectSenderType(msg.remitente)
+          const isFromAgent = isAgentMessage(senderType, msg.remitente)
+          const isSystem = senderType === SENDER_TYPES.SISTEMA
+          
+          return (
+            <div
+              key={msg.id}
+              className={`flex flex-col ${isSystem ? 'items-center' : isFromAgent ? 'items-end' : 'items-start'} max-w-[70%]`}
+            >
+              <div className="px-3 py-2 rounded-tr-xl rounded-br-xl rounded-bl-xl" style={{ 
+                backgroundColor: isSystem 
+                  ? (isDarkMode ? '#2d3339' : '#f3f4f6')  // Sistema: gris
+                  : isFromAgent 
+                    ? (isDarkMode ? '#005c4b' : '#dcf8c6')  // Agente/Bot: verde
+                    : (isDarkMode ? '#1e2830' : '#ffffff'),  // Cliente: blanco
+                color: textPrimary
+              }}>
+                <p className="font-chat-text text-chat-text">{msg.contenido}</p>
+                <div className={`flex justify-end mt-1 ${isFromAgent ? 'items-center gap-1' : ''}`}>
+                  <span className="text-[11px]" style={{ color: textSecondary }}>
+                    {(() => {
+                      const date = new Date(msg.creado_en)
+                      const hours = date.getHours().toString().padStart(2, '0')
+                      const minutes = date.getMinutes().toString().padStart(2, '0')
+                      return `${hours}:${minutes}`
+                    })()}
                   </span>
-                )}
+                  {isFromAgent && (
+                    <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      done_all
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
         <div ref={messagesEndRef} />
       </div>
 

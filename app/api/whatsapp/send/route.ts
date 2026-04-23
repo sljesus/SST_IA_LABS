@@ -2,7 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 
 export async function POST(request: NextRequest) {
-  const { to, message } = await request.json()
+  // Validate request body exists and is valid JSON
+  let body: { to?: unknown; message?: unknown }
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
+
+  const { to, message } = body
+
+  // Validate required fields
+  if (!to || typeof to !== 'string' || to.trim() === '') {
+    return NextResponse.json({ error: 'Missing or invalid "to" field (phone number required)' }, { status: 400 })
+  }
+  if (!message || typeof message !== 'string' || message.trim() === '') {
+    return NextResponse.json({ error: 'Missing or invalid "message" field (message content required)' }, { status: 400 })
+  }
 
   const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
@@ -14,8 +30,8 @@ export async function POST(request: NextRequest) {
   try {
     const response = await axios.post(`https://graph.facebook.com/v19.0/${phoneNumberId}/messages`, {
       messaging_product: 'whatsapp',
-      to,
-      text: { body: message }
+      to: to.trim(),
+      text: { body: message.trim() }
     }, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -23,8 +39,9 @@ export async function POST(request: NextRequest) {
       }
     })
     return NextResponse.json({ success: true, data: response.data })
-  } catch (error: any) {
-    console.error('WhatsApp API error:', error.response?.data)
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { data?: unknown }; message?: string }
+    console.error('WhatsApp API error:', axiosError.response?.data ?? axiosError.message)
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
   }
 }
