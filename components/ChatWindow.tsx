@@ -16,12 +16,17 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [aiMode, setAiMode] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('') // TODO: implementar búsqueda de mensajes
-  const [showSearch, setShowSearch] = useState(false) // TODO: mostrar/ocultar input de búsqueda
+  const [aiMode, setAiMode] = useState(conversation?.isActive ?? false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
+
+  // Sync aiMode when conversation changes
+  useEffect(() => {
+    setAiMode(conversation?.isActive ?? false)
+  }, [conversation?.isActive])
 
   // Theme-aware colors
   const chatBg = isDarkMode ? '#0b1013' : '#ffffff'
@@ -105,8 +110,22 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
     const newMode = !aiMode
     setAiMode(newMode)
 
-    // Here you would update the conversation's AI mode in the database
-    // For now, we'll just toggle the local state
+    try {
+      const response = await fetch('/api/conversations/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversationId: conversation.id, isActive: newMode })
+      })
+
+      if (!response.ok) {
+        // Revert on error
+        setAiMode(!newMode)
+      }
+    } catch (error) {
+      console.error('Error toggling AI mode:', error)
+      // Revert on error
+      setAiMode(!newMode)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
