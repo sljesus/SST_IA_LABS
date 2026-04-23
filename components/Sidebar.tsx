@@ -1,36 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Conversation } from '@/types/conversation'
 import { useTheme } from '@/components/theme/ThemeProvider'
-
-// Mock data con fechas fijas para evitar hydration mismatch
-const mockConversations = [
-  {
-    id: '1',
-    cliente: 'Juan Perez',
-    agente: 'Carlos',
-    isActive: true,
-    creado_en: '2026-04-22T23:10:00.000Z',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCznmi2LZ5QSQ13UwIj63r27phRTjTPUdYeu9exSPi2T0AsiCsp_ihmdIboZdo2rpcojcnJJFL9UX03vQwz-nLFrb9S-I5B2sETPNVNT-ALqRgIhKf6M04sBpbNtAaIPCNonfZko-F33OEiJt5pjD5Gw2ozNj_OF6avOSpoas3HSKQuRPXRyvoJStzw4ArDU6AuFW38ve80OPb6AD4usLbnIIv5ov8H6XJMpS4wzbC3u1amPxM1Kn2NYBlZs_GdsdS6c9njpJRVQpw'
-  },
-  {
-    id: '2',
-    cliente: 'Maria Garcia',
-    agente: 'Ana',
-    isActive: false,
-    creado_en: '2026-04-21T23:10:00.000Z',
-    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDujzp4TvfniN5CQxU_MaFPyOJsla4s8nEH29Iy5aaEwIBRs3zk05moB0BPVFPxf0bXdK-gIXdrYsWgqAFiNHskKvVFlowyWEbOu2U_HJWl8thzoBUQXq_1GPTgesz-fs1c5s3lNm18LdQgF-pR5KHGSDTeLEQ13W8FKLn6pqgz4HTgiN8ppG98Wkt_URm3WBFErso_KDvVDtfwgxLIJric3NboyRkiuMVHPtxd5CqVRcRf79a9nuA_Jmm_Iv5sdLtC1Fvx8r_jtw'
-  },
-  {
-    id: '3',
-    cliente: 'Logistics Team',
-    agente: 'Miguel',
-    isActive: false,
-    creado_en: '2026-04-22T21:00:00.000Z',
-    img: undefined // Group conversation
-  }
-]
+import { supabase } from '@/lib/supabase'
 
 interface SidebarProps {
   selectedConversation: Conversation | null
@@ -39,14 +12,42 @@ interface SidebarProps {
 
 export default function Sidebar({ selectedConversation, onSelectConversation }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const { theme, toggleTheme, mounted } = useTheme()
   const isDarkMode = theme === 'dark'
 
+  // Fetch conversations from Supabase
+  const fetchConversations = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from('conversaciones')
+        .select('*')
+        .order('creado_en', { ascending: false })
+      
+      if (supabaseError) {
+        throw supabaseError
+      }
+      
+      setConversations(data || [])
+    } catch (err: any) {
+      console.error('Error fetching conversations:', err)
+      setError(err.message || 'Error al cargar conversaciones')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchConversations()
+  }, [])
+
   // Instant toggle with direct DOM manipulation
   const handleToggle = () => {
-    // Toggle the dark class on html element directly
     document.documentElement.classList.toggle('dark')
-    // Also toggle in React state
     toggleTheme()
   }
 
@@ -55,24 +56,26 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
   const sidebarBorder = isDarkMode ? '#44474a' : '#e5e7eb'
   const textPrimary = isDarkMode ? '#3de273' : '#006d2f'
   const textSecondary = isDarkMode ? '#c4c7ca' : '#5c5f61'
+  const inputBg = isDarkMode ? '#2d3339' : '#f3f4f6'
+  const iconColor = isDarkMode ? '#6b7280' : '#9ca3af'
 
   const filteredConversations = useMemo(() => {
     if (!searchQuery.trim()) {
-      return mockConversations
+      return conversations
     }
-    return mockConversations.filter(conv =>
-      conv.cliente.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (conv as any).lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+    return conversations.filter(conv =>
+      conv.cliente?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      conv.agente?.toLowerCase().includes(searchQuery.toLowerCase())
     )
-  }, [searchQuery])
+  }, [conversations, searchQuery])
 
   const formatTime = (dateString: string) => {
+    if (!dateString) return ''
     const date = new Date(dateString)
     const now = new Date()
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
 
     if (diffInHours < 24) {
-      // Use consistent time formatting to avoid hydration mismatch
       const hours = date.getHours().toString().padStart(2, '0')
       const minutes = date.getMinutes().toString().padStart(2, '0')
       return `${hours}:${minutes}`
@@ -83,7 +86,7 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
     }
   }
 
-return (
+  return (
     <aside 
       className="flex flex-col h-full w-64 sm:w-72 md:w-80 lg:w-[320px] xl:w-[400px] border-r font-inter text-sm antialiased shrink-0"
       style={{ backgroundColor: sidebarBg, borderRightColor: sidebarBorder }}
@@ -124,19 +127,44 @@ return (
             </div>
           </div>
 <div className="space-y-1 p-2">
-            {filteredConversations.map(conv => (
-              <div
-                key={conv.id}
-                onClick={() => onSelectConversation(conv)}
-                className="flex items-center p-3 cursor-pointer rounded-lg border-l-4 transition-colors duration-200"
-                style={{ 
-                  backgroundColor: selectedConversation?.id === conv.id 
-                    ? (isDarkMode ? '#2d3339' : '#e5eff8') 
-                    : 'transparent',
-                  borderColor: selectedConversation?.id === conv.id 
-                    ? (isDarkMode ? '#3de273' : '#006d2f') 
-                    : 'transparent'
-                }}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <span className="material-symbols-outlined text-3xl animate-spin" style={{ color: textSecondary }}>progress_activity</span>
+                <p className="mt-2 text-sm" style={{ color: textSecondary }}>Cargando...</p>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <span className="material-symbols-outlined text-3xl" style={{ color: '#ef4444' }}>error</span>
+                <p className="mt-2 text-sm text-center" style={{ color: '#ef4444' }}>{error}</p>
+                <button 
+                  onClick={fetchConversations}
+                  className="mt-3 px-4 py-2 rounded-lg text-sm font-medium"
+                  style={{ backgroundColor: isDarkMode ? '#3de273' : '#006d2f', color: isDarkMode ? '#000' : '#fff' }}
+                >
+                  Reintentar
+                </button>
+              </div>
+            ) : filteredConversations.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <span className="material-symbols-outlined text-3xl" style={{ color: textSecondary }}>inbox</span>
+                <p className="mt-2 text-sm" style={{ color: textSecondary }}>
+                  {searchQuery ? 'Sin resultados' : 'No hay conversaciones'}
+                </p>
+              </div>
+            ) : (
+              filteredConversations.map(conv => (
+                <div
+                  key={conv.id}
+                  onClick={() => onSelectConversation(conv)}
+                  className="flex items-center p-3 cursor-pointer rounded-lg border-l-4 transition-colors duration-200"
+                  style={{ 
+                    backgroundColor: selectedConversation?.id === conv.id 
+                      ? (isDarkMode ? '#2d3339' : '#e5eff8') 
+                      : 'transparent',
+                    borderColor: selectedConversation?.id === conv.id 
+                      ? (isDarkMode ? '#3de273' : '#006d2f') 
+                      : 'transparent'
+                  }}
               >
                 {conv.img ? (
                   <img
@@ -157,11 +185,12 @@ return (
                     <span className="text-xs" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>{formatTime(conv.creado_en)}</span>
                   </div>
                   <p className="text-xs truncate" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>
-                    Agente: {conv.agente}
+                    Agente: {conv.agente || 'Sin agente'}
                   </p>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
