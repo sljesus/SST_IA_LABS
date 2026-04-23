@@ -13,15 +13,16 @@ interface SidebarProps {
 export default function Sidebar({ selectedConversation, onSelectConversation }: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [conversations, setConversations] = useState<Conversation[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { theme, toggleTheme, mounted } = useTheme()
   const isDarkMode = theme === 'dark'
 
   // Fetch conversations from Supabase
-  const fetchConversations = async () => {
-    setIsLoading(true)
-    setError(null)
+  const fetchConversations = async (isSilent = false) => {
+    if (!isSilent) {
+      setError(null)
+    }
     try {
       const { data, error: supabaseError } = await supabase
         .from('conversaciones')
@@ -35,14 +36,18 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
       setConversations(data || [])
     } catch (err: any) {
       console.error('Error fetching conversations:', err)
-      setError(err.message || 'Error al cargar conversaciones')
+      if (!isSilent) {
+        setError(err.message || 'Error al cargar conversaciones')
+      }
     } finally {
-      setIsLoading(false)
+      if (!isSilent) {
+        setIsInitialLoading(false)
+      }
     }
   }
 
   useEffect(() => {
-    fetchConversations()
+    fetchConversations(false) // Initial load with loading state
 
     // Realtime subscription for conversations
     const channel = supabase
@@ -55,8 +60,8 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
           table: 'conversaciones'
         },
         () => {
-          // Refresh the list when any change happens
-          fetchConversations()
+          // Silent refresh - no loading spinner
+          fetchConversations(true)
         }
       )
       .subscribe()
@@ -148,7 +153,7 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
             </div>
           </div>
 <div className="space-y-1 p-2">
-            {isLoading ? (
+            {isInitialLoading ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <span className="material-symbols-outlined text-3xl animate-spin" style={{ color: textSecondary }}>progress_activity</span>
                 <p className="mt-2 text-sm" style={{ color: textSecondary }}>Cargando...</p>
@@ -158,7 +163,7 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
                 <span className="material-symbols-outlined text-3xl" style={{ color: '#ef4444' }}>error</span>
                 <p className="mt-2 text-sm text-center" style={{ color: '#ef4444' }}>{error}</p>
                 <button 
-                  onClick={fetchConversations}
+                  onClick={() => fetchConversations(false)}
                   className="mt-3 px-4 py-2 rounded-lg text-sm font-medium"
                   style={{ backgroundColor: isDarkMode ? '#3de273' : '#006d2f', color: isDarkMode ? '#000' : '#fff' }}
                 >
