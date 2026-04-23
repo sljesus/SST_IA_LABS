@@ -28,6 +28,33 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
     setAiMode(conversation?.isActive ?? false)
   }, [conversation?.isActive])
 
+  // Realtime subscription for conversation changes
+  useEffect(() => {
+    if (!conversation) return
+
+    const channel = supabase
+      .channel(`conversation-${conversation.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'conversaciones',
+          filter: `id=eq.${conversation.id}`
+        },
+        (payload) => {
+          if (payload.new && 'isActive' in payload.new) {
+            setAiMode(payload.new.isActive)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [conversation?.id])
+
   // Theme-aware colors
   const chatBg = isDarkMode ? '#0b1013' : '#ffffff'
   const headerBg = isDarkMode ? '#181f23' : '#f9fafb'
@@ -52,6 +79,52 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
         setTimeout(scrollToBottom, 100)
       }
       fetchMessages()
+
+      // Realtime subscription for messages
+      const channel = supabase
+        .channel(`messages-${conversation.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'mensajes',
+            filter: `conversacion_id=eq.${conversation.id}`
+          },
+          (payload) => {
+            if (payload.new) {
+              setMessages(prev => {
+                // Avoid duplicates
+                if (prev.some(m => m.id === payload.new.id)) return prev
+                return [...prev, payload.new as Message].sort(
+                  (a, b) => new Date(a.creado_en).getTime() - new Date(b.creado_en).getTime()
+                )
+              })
+              setTimeout(scrollToBottom, 100)
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'mensajes',
+            filter: `conversacion_id=eq.${conversation.id}`
+          },
+          (payload) => {
+            if (payload.new) {
+              setMessages(prev =>
+                prev.map(m => m.id === payload.new.id ? payload.new as Message : m)
+              )
+            }
+          }
+        )
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
     }
   }, [conversation])
 

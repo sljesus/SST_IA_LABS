@@ -43,6 +43,27 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
 
   useEffect(() => {
     fetchConversations()
+
+    // Realtime subscription for conversations
+    const channel = supabase
+      .channel('conversations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversaciones'
+        },
+        () => {
+          // Refresh the list when any change happens
+          fetchConversations()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   // Instant toggle with direct DOM manipulation
