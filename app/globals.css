@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Custom Properties for Light Theme */
+:root {
+  --color-bg: #f5faff;
+  --color-surface: #f5faff;
+  --color-surface-container: #e5eff8;
+  --color-surface-container-low: #eaf5fe;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #dfeaf2;
+  --color-surface-dim: #d1dbe4;
+  --color-surface-bright: #f5faff;
+  --color-surface-variant: #d9e4ec;
+  --color-on-surface: #131d23;
+  --color-on-surface-variant: #3c4a3d;
+  --color-primary: #006d2f;
+  --color-primary-container: #25d366;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #005523;
+  --color-secondary: #5c5f61;
+  --color-secondary-container: #e0e3e6;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #626567;
+  --color-tertiary: #625e58;
+  --color-tertiary-container: #bdb7b0;
+  --color-on-tertiary: #ffffff;
+  --color-outline: #6c7b6b;
+  --color-outline-variant: #bbcbb9;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-inverse-surface: #283238;
+  --color-inverse-on-surface: #e8f2fb;
+  --color-inverse-primary: #3de273;
+  --color-chat-bg: #E5DDD5;
+  --color-chat-sent: #DCF8C6;
+  --color-chat-received: #FFFFFF;
+}
+
+/* Dark Theme */
+.dark {
+  --color-bg: #0b1418;
+  --color-surface: #161c20;
+  --color-surface-container: #1c282e;
+  --color-surface-container-low: #181f23;
+  --color-surface-container-lowest: #0b1418;
+  --color-surface-container-high: #1e2830;
+  --color-surface-dim: #141c20;
+  --color-surface-bright: #1e2830;
+  --color-surface-variant: #3f4a51;
+  --color-on-surface: #e1e9ed;
+  --color-on-surface-variant: #bccbb9;
+  --color-primary: #3de273;
+  --color-primary-container: #005322;
+  --color-on-primary: #003915;
+  --color-on-primary-container: #66ff8e;
+  --color-secondary: #c4c7ca;
+  --color-secondary-container: #44474a;
+  --color-on-secondary: #1c282e;
+  --color-on-secondary-container: #e1e9ed;
+  --color-tertiary: #c9c4bd;
+  --color-tertiary-container: #5c5650;
+  --color-on-tertiary: #352f28;
+  --color-outline: #5c6560;
+  --color-outline-variant: #44474a;
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffdad6;
+  --color-inverse-surface: #e1e9ed;
+  --color-inverse-on-surface: #1e2830;
+  --color-inverse-primary: #006d2f;
+  --color-chat-bg: #0b1013;
+  --color-chat-sent: #005c4b;
+  --color-chat-received: #1e2830;
+}
+
+/* Material Symbols Outlined font settings */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    @apply bg-surface font-body-base text-on-surface antialiased overflow-hidden;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    background-color: var(--color-bg);
+    color: var(--color-on-surface);
+  }
+
+  .dark body {
+    background-color: var(--color-bg);
+    color: var(--color-on-surface);
+  }
+}
+
+/* Custom components */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-on-primary font-medium px-4 py-2 rounded-xl transition-colors duration-200 shadow-soft;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-outline rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200;
+  }
+
+  .conversation-item {
+    @apply p-4 border-b border-gray-50 cursor-pointer transition-colors duration-200 hover:bg-gray-50;
+  }
+
+  .conversation-item.active {
+    @apply bg-surface-container-low border-l-4 border-primary;
+  }
+
+  .message-bubble {
+    @apply px-3 py-2 rounded-tr-xl rounded-br-xl rounded-bl-xl max-w-[70%] break-words;
+  }
+
+  .message-sent {
+    @apply message-bubble bg-primary-container text-on-primary-container ml-auto shadow-chat;
+  }
+
+  .message-received {
+    @apply message-bubble bg-chat-received text-on-surface mr-auto shadow-chat;
+  }
+
+
+}
+
+/* Custom scrollbars */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+
+  .dark .scrollbar-thin {
+    scrollbar-color: #3f4a51 transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 10px;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #3f4a51;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #5c6560;
+  }
+}

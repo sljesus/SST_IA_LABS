@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#3c4a3d",
+                    "secondary-fixed-dim": "#c4c7ca",
+                    "primary-fixed-dim": "#3de273",
+                    "on-secondary-fixed-variant": "#44474a",
+                    "surface-tint": "#006d2f",
+                    "on-tertiary-fixed-variant": "#4a4641",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-container": "#4c4842",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#1e1b17",
+                    "surface-bright": "#f5faff",
+                    "secondary-fixed": "#e0e3e6",
+                    "surface-dim": "#d1dbe4",
+                    "surface-container-high": "#dfeaf2",
+                    "inverse-on-surface": "#e8f2fb",
+                    "surface-container": "#e5eff8",
+                    "surface": "#f5faff",
+                    "surface-container-low": "#eaf5fe",
+                    "primary-fixed": "#66ff8e",
+                    "on-surface": "#131d23",
+                    "on-primary-fixed-variant": "#005322",
+                    "on-primary-fixed": "#002109",
+                    "primary": "#006d2f",
+                    "outline-variant": "#bbcbb9",
+                    "surface-variant": "#d9e4ec",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#25d366",
+                    "on-error-container": "#93000a",
+                    "inverse-surface": "#283238",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#e0e3e6",
+                    "outline": "#6c7b6b",
+                    "background": "#f5faff",
+                    "secondary": "#5c5f61",
+                    "surface-container-highest": "#d9e4ec",
+                    "tertiary": "#625e58",
+                    "on-secondary-container": "#626567",
+                    "error": "#ba1a1a",
+                    "on-background": "#131d23",
+                    "inverse-primary": "#3de273",
+                    "on-primary-container": "#005523",
+                    "on-secondary-fixed": "#191c1e",
+                    "tertiary-fixed": "#e8e1d9",
+                    "tertiary-container": "#bdb7b0",
+                    "tertiary-fixed-dim": "#ccc5be",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "lg": "24px",
+                    "sidebar_width": "320px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "chat_max_width": "800px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "chat-text": ["Inter"],
+                    "h2": ["Inter"],
+                    "body-base": ["Inter"],
+                    "h1": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "chat-text": ["14.5px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "h2": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-base": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+                    "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+        .chat-shadow {
+            box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+        }
+    </style>
+</head>
+<body class="bg-surface-dim font-body-base text-on-surface antialiased overflow-hidden">
+<div class="flex h-screen overflow-hidden">
+<!-- SideNavBar Component -->
+<aside class="flex flex-col h-full py-4 w-[320px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 font-inter text-sm antialiased shrink-0">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-6">
+<img alt="User Profile Avatar" class="w-10 h-10 rounded-full object-cover" data-alt="professional male headshot with neutral background soft studio lighting corporate profile style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCznmi2LZ5QSQ13UwIj63r27phRTjTPUdYeu9exSPi2T0AsiCsp_ihmdIboZdo2rpcojcnJJFL9UX03vQwz-nLFrb9S-I5B2sETPNVNT-ALqRgIhKf6M04sBpbNtAaIPCNonfZko-F33OEiJt5pjD5Gw2ozNj_OF6avOSpoas3HSKQuRPXRyvoJStzw4ArDU6AuFW38ve80OPb6AD4usLbnIIv5ov8H6XJMpS4wzbC3u1amPxM1Kn2NYBlZs_GdsdS6c9njpJRVQpw"/>
+<div class="flex flex-col">
+<span class="text-xl font-bold text-green-600 dark:text-green-500">Operator Console</span>
+<span class="text-xs text-green-600/70 font-medium">AI Active</span>
+</div>
+</div>
+<button class="w-full py-2.5 px-4 bg-primary text-white rounded-lg font-semibold flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+                    New Chat
+                </button>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="bg-white dark:bg-gray-800 text-green-600 dark:text-green-400 border-l-4 border-green-500 font-semibold flex items-center px-6 py-3 cursor-pointer">
+<span class="material-symbols-outlined mr-4" data-icon="chat">chat</span>
+                    Chats
+                </div>
+<div class="text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center px-6 py-3 cursor-pointer">
+<span class="material-symbols-outlined mr-4" data-icon="smart_toy">smart_toy</span>
+                    Automation
+                </div>
+<div class="text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center px-6 py-3 cursor-pointer">
+<span class="material-symbols-outlined mr-4" data-icon="bar_chart">bar_chart</span>
+                    Analytics
+                </div>
+<div class="text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center px-6 py-3 cursor-pointer">
+<span class="material-symbols-outlined mr-4" data-icon="settings">settings</span>
+                    Settings
+                </div>
+</nav>
+<div class="mt-auto px-6 pt-4 border-t border-gray-100">
+<div class="text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center py-3 cursor-pointer">
+<span class="material-symbols-outlined mr-4" data-icon="logout">logout</span>
+                    Logout
+                </div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex flex-1 flex-col overflow-hidden bg-[#F0F2F5]">
+<!-- TopAppBar Component -->
+<header class="flex items-center justify-between px-6 w-full h-16 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm sticky top-0 z-40 shrink-0">
+<div class="flex items-center gap-8">
+<h1 class="text-lg font-black text-gray-900 dark:text-white">WhatsApp AI Agent</h1>
+<nav class="hidden md:flex gap-6 font-inter text-base font-medium">
+<span class="text-green-600 dark:text-green-400 border-b-2 border-green-500 py-4 cursor-pointer">Dashboard</span>
+<span class="text-gray-600 dark:text-gray-400 hover:text-green-500 transition-all py-4 cursor-pointer">History</span>
+<span class="text-gray-600 dark:text-gray-400 hover:text-green-500 transition-all py-4 cursor-pointer">Queues</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-gray-200">
+<span class="material-symbols-outlined text-gray-400 text-[18px]" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48" placeholder="Search conversations..." type="text"/>
+</div>
+<span class="material-symbols-outlined text-gray-600 hover:text-green-500 cursor-pointer" data-icon="smart_toy">smart_toy</span>
+<span class="material-symbols-outlined text-gray-600 hover:text-green-500 cursor-pointer" data-icon="more_vert">more_vert</span>
+</div>
+</header>
+<!-- Chat Content Grid -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Left: Conversation List -->
+<section class="w-80 bg-white border-r border-[#E9EDEF] flex flex-col shrink-0">
+<div class="overflow-y-auto flex-1">
+<!-- Active Item -->
+<div class="flex items-center p-4 bg-[#F5F6F6] border-l-4 border-primary cursor-pointer">
+<img alt="Juan Perez Profile" class="w-12 h-12 rounded-full mr-3 object-cover" data-alt="close-up portrait of a friendly latino man in his late 20s wearing a casual shirt soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCFp3f-KzR_TWCOuOVB4TXbGX4DR-SVt1dcf1PnEkaceHEylQOcNRD7DMWh1r-sYa4J91WdgMOYVb3Ne7xg9_lw92jVx_Oan94X3RdlRedhYqeJhShF8cCVZpafj8qiz00ZxaHSin0RYFtLx5BbaSGONyChsEJyn3R6yt9IO3tGOayVf0pLbfeHgoQAcpVgnGTbghOF0gj38Ix7fGDSm4uM7c5nirQTbnFrhdaMI1cZQl8JMatTWVKVr_HmiSgTlRHedkxgyxdh4o"/>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-semibold text-on-surface truncate">Juan Perez</h3>
+<span class="text-xs text-gray-500">14:02</span>
+</div>
+<p class="text-xs text-gray-500 truncate">I'll wait for your confirmation about the delivery date.</p>
+</div>
+</div>
+<!-- List Item -->
+<div class="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-50">
+<img alt="Maria Garcia Profile" class="w-12 h-12 rounded-full mr-3 object-cover" data-alt="portrait of a young woman with curly hair smiling outdoors in a city setting soft morning sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDujzp4TvfniN5CQxU_MaFPyOJsla4s8nEH29Iy5aaEwIBRs3zk05moB0BPVFPxf0bXdK-gIXdrYsWgqAFiNHskKvVFlowyWEbOu2U_HJWl8thzoBUQXq_1GPTgesz-fs1c5s3lNm18LdQgF-pR5KHGSDTeLEQ13W8FKLn6pqgz4HTgiN8ppG98Wkt_URm3WBFErso_KDvVDtfwgxLIJric3NboyRkiuMVHPtxd5CqVRcRf79a9nuA_Jmm_Iv5sd9LtC1Fvx8r_jtw"/>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-semibold text-on-surface truncate">Maria Garcia</h3>
+<span class="text-xs text-gray-500">12:45</span>
+</div>
+<p class="text-xs text-gray-500 truncate">Thanks for the quick response!</p>
+</div>
+</div>
+<!-- List Item -->
+<div class="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-50">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mr-3">
+<span class="material-symbols-outlined text-secondary" data-icon="group">group</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-semibold text-on-surface truncate">Logistics Team</h3>
+<span class="text-xs text-gray-500">11:20</span>
+</div>
+<p class="text-xs text-gray-500 truncate">Carlos: The package is already at the warehouse.</p>
+</div>
+</div>
+<!-- List Item -->
+<div class="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-50">
+<img alt="Robert Smith Profile" class="w-12 h-12 rounded-full mr-3 object-cover" data-alt="mature professional man with glasses and a gray beard smiling warmly professional indoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw64vb4WTIlec8ptWe2ms3uFyy0VlQMNPafYtCJSpm-B8zfzUCJCAyy_S5foYNC5PsbfQY-LzXNWB834ur_6VQux7yO4G5xVE7UYg-5ogX0rVuEjFhzU2ze_XvielmT85_7hyk1shWDINgAl3ulWDBDfDzSbSO3pASSNy7Tadq1OjWqISLDbmUaC2cfQEbU48cMHT_Sv_Prwrdbq8AhNOdv0E-Ma6npUind0B0w6LoqpZ1VElrP2wldNvbbX2iuILDD0KUT4kiQY0"/>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-0.5">
+<h3 class="font-semibold text-on-surface truncate">Robert Smith</h3>
+<span class="text-xs text-gray-500">Yesterday</span>
+</div>
+<p class="text-xs text-gray-500 truncate">Can we schedule a call for next week?</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Right: Chat Window -->
+<section class="flex-1 flex flex-col relative">
+<!-- Chat Header -->
+<div class="h-16 px-6 bg-gray-50 border-b border-[#E9EDEF] flex items-center justify-between shrink-0">
+<div class="flex items-center">
+<img alt="Juan Perez Profile" class="w-10 h-10 rounded-full mr-3 object-cover" data-alt="close-up portrait of a friendly latino man in his late 20s wearing a casual shirt soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYhipl-64MkYs2YGyJoFGFi-x_FFXgjM4qxYQuvof8AgF9wuC3-2yznG2noUmXEmJlnMPcPaoQ-fp1uwgNewwMrmX9MQEbP04S8ySTg4Wh76sicF2Ld_3ZNaXgfud9FF9-ZdW57lCP0d2X8qhqhWsdBevCS384xSdGBF2TAaBggCXW36urC2Pn-bzqnREK1fFpDU1ULEVYmzrPU6vPtEa58tLeF2eZXPhHTNgeB_iHMDdVDqnBQEwrTBjiPicQJc5XMHDOXULbZTc"/>
+<div>
+<h2 class="text-body-base font-semibold text-on-surface">Juan Perez</h2>
+<p class="text-[12px] text-green-600 flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    Online
+                                </p>
+</div>
+</div>
+<!-- AI Toggle (OFF Mode) -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-3 pr-4 border-r border-gray-200">
+<span class="material-symbols-outlined text-gray-400" data-icon="smart_toy">smart_toy</span>
+<span class="text-label-caps font-bold text-gray-500 uppercase">Modo Agente IA</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<div class="w-11 h-6 bg-gray-300 rounded-full shadow-inner"></div>
+<div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transition-transform translate-x-0"></div>
+</div>
+<span class="text-label-caps font-bold text-gray-400 uppercase">OFF</span>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-primary" data-icon="search">search</span>
+<span class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-primary" data-icon="attach_file">attach_file</span>
+<span class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-primary" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</div>
+<!-- Messages Area -->
+<div class="flex-1 overflow-y-auto p-8 space-y-4 bg-[#E5DDD5]" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPbTHEnGyxA1ZIsJKSXJ3GFZrcdtTWrS1oTlEqYy0C4In_eFBdJhG-WmUXG8KqsRziW2IR2-rjK0UMiWNyu4KoIOs7-8kL2LS95fwMB6nqo9j2idxYYgloa95pJ3IRzWXU0LqVvF5SCL2YY4B7vdGa6nJA0u34MHqp--c1cIOejwFPUBs9k-21TTtBOh0kAfWHXD_xtzqwazrRtffMoTAxlvDRKsUxphC3wnfQvWcQcmQp_WJMK0eF7XmqoVHhDVdyeMiHZVeyv90');">
+<div class="flex justify-center mb-6">
+<span class="bg-white/80 px-3 py-1 rounded-lg text-xs font-medium text-gray-600 shadow-sm uppercase tracking-wide">Today</span>
+</div>
+<!-- Received Message -->
+<div class="flex flex-col items-start max-w-[70%]">
+<div class="bg-white text-[#111B21] p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl chat-shadow relative">
+<p class="font-chat-text text-chat-text">Hello! I'm interested in the premium subscription plan. Could you tell me the pricing for a team of 10?</p>
+<div class="flex justify-end mt-1">
+<span class="text-[11px] text-gray-400">13:45</span>
+</div>
+</div>
+</div>
+<!-- Sent Message (Human/Agent) -->
+<div class="flex flex-col items-end w-full">
+<div class="max-w-[70%] bg-primary-container text-on-primary-container p-3 rounded-tl-xl rounded-br-xl rounded-bl-xl chat-shadow relative">
+<p class="font-chat-text text-chat-text">Hi Juan! Absolutely. Our Team Premium plan is $89/month for up to 12 users. It includes all automation features and priority support.</p>
+<div class="flex justify-end items-center gap-1 mt-1">
+<span class="text-[11px] text-on-primary-container/70">13:50</span>
+<span class="material-symbols-outlined text-[14px] text-on-primary-container/70" data-icon="done_all" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+</div>
+<!-- Received Message -->
+<div class="flex flex-col items-start max-w-[70%] mt-2">
+<div class="bg-white text-[#111B21] p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl chat-shadow relative">
+<p class="font-chat-text text-chat-text">That sounds perfect. Do you offer an annual discount?</p>
+<div class="flex justify-end mt-1">
+<span class="text-[11px] text-gray-400">13:55</span>
+</div>
+</div>
+</div>
+<!-- Sent Message (Human/Agent) -->
+<div class="flex flex-col items-end w-full mt-2">
+<div class="max-w-[70%] bg-primary-container text-on-primary-container p-3 rounded-tl-xl rounded-br-xl rounded-bl-xl chat-shadow relative">
+<p class="font-chat-text text-chat-text">Yes, if you pay annually you get 2 months free! The total would be $890 for the whole year.</p>
+<div class="flex justify-end items-center gap-1 mt-1">
+<span class="text-[11px] text-on-primary-container/70">13:58</span>
+<span class="material-symbols-outlined text-[14px] text-on-primary-container/70" data-icon="done_all" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+</div>
+<!-- Received Message -->
+<div class="flex flex-col items-start max-w-[70%] mt-2">
+<div class="bg-white text-[#111B21] p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl chat-shadow relative">
+<p class="font-chat-text text-chat-text">Great. I'll wait for your confirmation about the delivery date of the activation code.</p>
+<div class="flex justify-end mt-1">
+<span class="text-[11px] text-gray-400">14:02</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Message Input Area -->
+<div class="bg-[#F0F2F5] px-6 py-4 flex items-center gap-4 shrink-0 border-t border-gray-200">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-primary" data-icon="sentiment_satisfied">sentiment_satisfied</span>
+<span class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-primary" data-icon="attach_file">attach_file</span>
+</div>
+<div class="flex-1">
+<input class="w-full bg-white border-none rounded-xl px-4 py-3 focus:ring-0 text-body-base shadow-sm" placeholder="Type a message..." type="text"/>
+</div>
+<button class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-primary/90 transition-colors shadow-md">
+<span class="material-symbols-outlined" data-icon="send" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>
