@@ -4,7 +4,7 @@
  */
 
 import { supabase } from './supabase'
-import { TABLES, CONVERSATION_FIELDS, MESSAGE_FIELDS, SENDER_TYPES } from './constants'
+import { TABLES, CONVERSATION_FIELDS, MESSAGE_FIELDS, SENDER_TYPES, detectSenderType } from './constants'
 import type { Conversation } from '@/types/conversation'
 import type { Message, SenderType } from '@/types/message'
 
@@ -33,6 +33,46 @@ export const conversationService = {
       .from(TABLES.CONVERSACIONES)
       .select('*')
       .eq(CONVERSATION_FIELDS.ID, id)
+      .single()
+
+    if (error) {
+      throw error
+    }
+    return data
+  },
+
+  /**
+   * Fetch conversation by WhatsApp ID
+   */
+  async getByWaId(waId: string): Promise<Conversation | null> {
+    const { data, error } = await supabase
+      .from(TABLES.CONVERSACIONES)
+      .select('*')
+      .eq(CONVERSATION_FIELDS.WA_ID, waId)
+      .single()
+
+    if (error) {
+      // If not found, return null instead of throwing
+      return null
+    }
+    return data
+  },
+
+  /**
+   * Create a new conversation
+   */
+  async create(cliente: string, telefono: string, waId: string): Promise<Conversation> {
+    const { data, error } = await supabase
+      .from(TABLES.CONVERSACIONES)
+      .insert({
+        [CONVERSATION_FIELDS.ID]: crypto.randomUUID(),
+        [CONVERSATION_FIELDS.CLIENTE]: cliente,
+        [CONVERSATION_FIELDS.TELEFONO]: telefono,
+        [CONVERSATION_FIELDS.WA_ID]: waId,
+        [CONVERSATION_FIELDS.AGENTE]: 'agente', // default agent
+        [CONVERSATION_FIELDS.IS_ACTIVE]: true,
+      })
+      .select()
       .single()
 
     if (error) {
@@ -97,16 +137,17 @@ export const messageService = {
   },
 
   /**
-   * Send a message from the client (incoming)
+   * Receive a message (incoming from client or bot)
    */
   async receive(conversationId: string, content: string, remitente: string = SENDER_TYPES.CLIENTE): Promise<Message> {
+    const senderType = detectSenderType(remitente)
     const { data, error } = await supabase
       .from(TABLES.MENSAJES)
       .insert({
         [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
         [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
         [MESSAGE_FIELDS.REMITENTE]: remitente,
-        sender_type: SENDER_TYPES.CLIENTE,
+        sender_type: senderType,
         [MESSAGE_FIELDS.CONTENIDO]: content,
       })
       .select()
