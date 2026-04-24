@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Conversation } from '@/types/conversation'
 import { useTheme } from '@/components/theme/ThemeProvider'
 import { conversationService, realtimeService } from '@/lib/db'
+import { supabase } from '@/lib/supabase'
 import { CONVERSATION_FIELDS } from '@/lib/constants'
 
 interface SidebarProps {
@@ -47,9 +48,10 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
       // Silent refresh - no loading spinner
       fetchConversations(true)
     })
+    channel.subscribe()
 
     return () => {
-      // Clean up is handled by the service internally
+      supabase.removeChannel(channel)
     }
   }, [])
 

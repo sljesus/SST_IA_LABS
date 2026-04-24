@@ -5,6 +5,7 @@ import { Conversation } from '@/types/conversation'
 import { Message, SenderType } from '@/types/message'
 import { useTheme } from '@/components/theme/ThemeProvider'
 import { messageService, realtimeService } from '@/lib/db'
+import { supabase } from '@/lib/supabase'
 import { SENDER_TYPES, isAgentMessage, detectSenderType } from '@/lib/constants'
 
 interface Props {
@@ -36,9 +37,10 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
     const channel = realtimeService.onConversationUpdate(conversation.id, (updated) => {
       setAiMode(updated.isActive)
     })
+    channel.subscribe()
 
     return () => {
-      // Clean up is handled by the service internally
+      supabase.removeChannel(channel)
     }
   }, [conversation?.id])
 
@@ -74,9 +76,10 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
         })
         setTimeout(scrollToBottom, 100)
       })
+      channel.subscribe()
 
       return () => {
-        // Clean up is handled by the service internally
+        supabase.removeChannel(channel)
       }
     }
   }, [conversation])
@@ -95,11 +98,18 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
       // Save to database
       await messageService.send(conversation.id, messageContent)
 
-      // Send to WhatsApp
+      // Send to WhatsApp - extrae wa_id del id de conversación (antes del _)
+      const waId = conversation.id.split('_')[0] // ej: "525612958575_5215648680084" -> "525612958575"
+      if (!waId || waId.length < 10) {
+        alert('Error: No se pudo extraer wa_id del ID de conversación.')
+        return
+      }
+      const phoneNumber = `+${waId}` // Agrega + al wa_id
+      console.log('Enviando a wa_id:', waId, 'Número formateado:', phoneNumber)
       const response = await fetch('/api/whatsapp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: conversation.cliente, message: messageContent })
+        body: JSON.stringify({ to: phoneNumber, message: messageContent })
       })
 
       if (response.ok) {
@@ -108,10 +118,13 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
         const data = await messageService.getByConversationId(conversation.id)
         setMessages(data)
       } else {
-        console.error('WhatsApp API error:', await response.text())
+        const errorText = await response.text()
+        console.error('WhatsApp API error:', response.status, errorText)
+        alert('Error WhatsApp: ' + response.status + ' - ' + errorText)
       }
     } catch (error) {
       console.error('Send message error:', error)
+      alert('Error al enviar: ' + (error instanceof Error ? error.message : JSON.stringify(error)))
     } finally {
       setIsLoading(false)
     }

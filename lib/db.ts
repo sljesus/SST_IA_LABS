@@ -81,6 +81,7 @@ export const messageService = {
     const { data, error } = await supabase
       .from(TABLES.MENSAJES)
       .insert({
+        [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
         [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
         [MESSAGE_FIELDS.REMITENTE]: SENDER_TYPES.AGENTE,
         sender_type: SENDER_TYPES.AGENTE, // NEW: explicit sender_type for scalable UI
@@ -102,6 +103,7 @@ export const messageService = {
     const { data, error } = await supabase
       .from(TABLES.MENSAJES)
       .insert({
+        [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
         [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
         [MESSAGE_FIELDS.REMITENTE]: remitente,
         sender_type: SENDER_TYPES.CLIENTE,
@@ -123,6 +125,7 @@ export const messageService = {
     const { data, error } = await supabase
       .from(TABLES.MENSAJES)
       .insert({
+        [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
         [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
         [MESSAGE_FIELDS.REMITENTE]: botName,
         sender_type: SENDER_TYPES.BOT,
@@ -144,6 +147,7 @@ export const messageService = {
     const { data, error } = await supabase
       .from(TABLES.MENSAJES)
       .insert({
+        [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
         [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
         [MESSAGE_FIELDS.REMITENTE]: 'Sistema',
         sender_type: SENDER_TYPES.SISTEMA,
@@ -176,7 +180,6 @@ export const realtimeService = {
         },
         callback
       )
-      .subscribe()
   },
 
   /**
@@ -195,7 +198,6 @@ export const realtimeService = {
         },
         (payload) => callback(payload.new as unknown as Message)
       )
-      .subscribe()
   },
 
   /**
@@ -214,6 +216,5 @@ export const realtimeService = {
         },
         (payload) => callback(payload.new as unknown as Conversation)
       )
-      .subscribe()
   },
 }

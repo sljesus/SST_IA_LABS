@@ -47,6 +47,7 @@ export default function ChatArea({ conversation }: Props) {
     try {
       // Save to database
       const { error: dbError } = await supabase.from('mensajes').insert({
+        id: crypto.randomUUID(),
         conversacion_id: conversation.id,
         remitente: 'agente',
         contenido: messageContent
@@ -57,11 +58,17 @@ export default function ChatArea({ conversation }: Props) {
         return
       }
 
-      // Send to WhatsApp
+      // Send to WhatsApp - extrae wa_id del id de conversación (antes del _)
+      const waId = conversation.id.split('_')[0] // ej: "525612958575_5215648680084" -> "525612958575"
+      if (!waId || waId.length < 10) {
+        alert('Error: No se pudo extraer wa_id del ID de conversación.')
+        return
+      }
+      const phoneNumber = `+${waId}` // Agrega + al wa_id
       const response = await fetch('/api/whatsapp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: conversation.cliente, message: messageContent })
+        body: JSON.stringify({ to: phoneNumber, message: messageContent })
       })
 
       if (response.ok) {
