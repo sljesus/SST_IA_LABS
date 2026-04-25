@@ -86,13 +86,17 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
 
     if (diffInHours < 24) {
-      const hours = date.getHours().toString().padStart(2, '0')
-      const minutes = date.getMinutes().toString().padStart(2, '0')
-      return `${hours}:${minutes}`
+      const formatter = new Intl.DateTimeFormat('es-MX', {
+        timeZone: 'America/Mexico_City',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+      return formatter.format(date)
     } else if (diffInHours < 48) {
       return 'Yesterday'
     } else {
-      return date.toLocaleDateString()
+      return date.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' })
     }
   }
 

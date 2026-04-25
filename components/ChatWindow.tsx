@@ -280,9 +280,13 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
                     <span className="text-[11px] text-[var(--color-on-surface-variant)]">
                       {(() => {
                         const date = new Date(msg.creado_en)
-                        const hours = date.getHours().toString().padStart(2, '0')
-                        const minutes = date.getMinutes().toString().padStart(2, '0')
-                        return `${hours}:${minutes}`
+                        const formatter = new Intl.DateTimeFormat('es-MX', {
+                          timeZone: 'America/Mexico_City',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        })
+                        return formatter.format(date)
                       })()}
                     </span>
                     {isFromAgent && (
