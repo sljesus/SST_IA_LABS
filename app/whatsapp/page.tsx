@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import Sidebar from '@/components/Sidebar'
 import ChatWindow from '@/components/ChatWindow'
 import NotificationToast from '@/components/NotificationToast'
@@ -25,6 +25,9 @@ export default function WhatsAppPage() {
   const [pendingConversation, setPendingConversation] = useState<Conversation | null>(null)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
+  
+  // Ref para tracking imediato del isActive (sin esperar async)
+  const currentConversationActiveRef = useRef<boolean | null>(null)
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -42,16 +45,22 @@ export default function WhatsAppPage() {
   }, [fetchConversations])
 
   const handleSelectConversation = (conversation: Conversation) => {
+    // Usar el valor de la conversación ACTUAL del array (ya actualizado por toggle)
+    const currentConvData = conversations.find(c => c.id === selectedConversation?.id)
+    const actualWasActive = currentConvData?.isActive ?? selectedConversation?.isActive ?? null
+    
     console.log('[page] handleSelectConversation:', {
-      selectedConv: selectedConversation?.cliente,
-      selectedIsActive: selectedConversation?.isActive,
-      clickedConv: conversation.cliente,
+      selectedId: selectedConversation?.id,
+      actualWasActive,
+      clickedId: conversation.id,
+      clickedCliente: conversation.cliente,
       clickedIsActive: conversation.isActive,
+      showModal: actualWasActive === false
     })
     if (
       selectedConversation &&
       selectedConversation.id !== conversation.id &&
-      selectedConversation.isActive === false
+      actualWasActive === false
     ) {
       console.log('[page] MOSTRANDO MODAL — IA desactivada al salir')
       setPendingConversation(conversation)
@@ -63,6 +72,8 @@ export default function WhatsAppPage() {
     setConversations(prev => prev.map(c => 
       c.id === conversation.id ? { ...c, unread_count: 0 } : c
     ))
+    // Resetear el ref con el valor de la nueva conversación
+    currentConversationActiveRef.current = conversation.isActive
     setSelectedConversation(conversation)
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setShowSidebar(false)
@@ -73,17 +84,9 @@ export default function WhatsAppPage() {
     console.log('[page] handleLeaveAIDisabled — salir sin activar')
     setShowAIModal(false)
     if (pendingConversation) {
-      // Limpiar pending ANTES de cambiar selected para evitar loop
-      const dest = pendingConversation
+      currentConversationActiveRef.current = pendingConversation.isActive
+      setSelectedConversation(pendingConversation)
       setPendingConversation(null)
-      clearUnreadCount(dest.id)
-      setConversations(prev => prev.map(c => 
-        c.id === dest.id ? { ...c, unread_count: 0 } : c
-      ))
-      setSelectedConversation(dest)
-    }
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setShowSidebar(false)
     }
   }, [pendingConversation])
 
@@ -103,23 +106,15 @@ export default function WhatsAppPage() {
         })
       })
       
+      currentConversationActiveRef.current = true
       setConversations(prev => prev.map(c => 
         c.id === currentConv.id ? { ...c, isActive: true } : c
       ))
       
-      // Limpiar pending ANTES de cambiar selected para evitar loop
       setShowAIModal(false)
       setPendingConversation(null)
-      
-      clearUnreadCount(destConv.id)
-      setConversations(prev => prev.map(c => 
-        c.id === destConv.id ? { ...c, unread_count: 0 } : c
-      ))
+      currentConversationActiveRef.current = destConv.isActive
       setSelectedConversation(destConv)
-      
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        setShowSidebar(false)
-      }
     } catch (err) {
       console.error('Error reactivando IA:', err)
       setShowAIModal(false)
@@ -202,15 +197,11 @@ export default function WhatsAppPage() {
             hasSelectedConversation={!!selectedConversation}
             onNewMessageFromOther={handleNewMessageFromOther}
             onConversationToggle={(id, isActive) => {
-              console.log('[page] onConversationToggle:', id, 'isActive:', isActive)
+              console.log('[page] onConversationToggle (instant):', id, isActive)
+              currentConversationActiveRef.current = isActive
               setConversations(prev => prev.map(c => 
                 c.id === id ? { ...c, isActive } : c
               ))
-              // También actualizar selectedConversation si es la misma
-              if (selectedConversation?.id === id) {
-                console.log('[page] Actualizando selectedConversation.isActive a:', isActive)
-                setSelectedConversation(prev => prev ? { ...prev, isActive } : null)
-              }
             }}
           />
         </div>

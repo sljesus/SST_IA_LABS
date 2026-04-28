@@ -181,9 +181,9 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
     if (!conversation) return
 
     const newMode = !aiMode
-    console.log('[ChatWindow] toggleAiMode:', conversation.id, conversation.cliente, '->', newMode)
-    setAiMode(newMode)
-
+    setAiMode(newMode)  // UI cambia inmediatamente
+    onConversationToggle?.(conversation.id, newMode)  // Callback inmediatamente
+    
     try {
       const res = await fetch('/api/conversations/toggle', {
         method: 'POST',
@@ -191,17 +191,13 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
         body: JSON.stringify({ conversationId: conversation.id, isActive: newMode })
       })
       
-      console.log('[ChatWindow] toggleAiMode response:', res.status, res.statusText)
-      if (res.ok) {
-        console.log('[ChatWindow] toggleAiMode OK — calling callback')
-        onConversationToggle?.(conversation.id, newMode)
-      } else {
-        console.log('[ChatWindow] toggleAiMode FALLO — revertiendo')
+      if (!res.ok) {
         setAiMode(!newMode)
+        onConversationToggle?.(conversation.id, !newMode)
       }
-    } catch (err) {
-      console.log('[ChatWindow] toggleAiMode error:', err, '— revertiendo')
+    } catch {
       setAiMode(!newMode)
+      onConversationToggle?.(conversation.id, !newMode)
     }
   }
 
