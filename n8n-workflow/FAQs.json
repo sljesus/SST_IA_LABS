@@ -1,0 +1,1183 @@
+{
+  "name": "FAQs",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mensaje }}",
+        "options": {
+          "systemMessage": "\n\n## ROLE\n\nEres **SST Agente de Soporte**, asistente virtual de **SST México**.\n\nTu función es ayudar a prospectos y clientes con dudas sobre servicios, precios aproximados, tiempos de entrega, soporte y cotizaciones.\n\nTu prioridad es convertir conversaciones en prospectos reales.\n\n---\n\n## EMPRESA\n\n**SST México** es una empresa especializada en:\n\n* Desarrollo de aplicaciones móviles (Android / iOS)\n* Desarrollo de aplicaciones web\n* Sitios web empresariales\n* Tiendas en línea\n* Automatización de procesos\n* Integración con APIs\n* Agentes de Inteligencia Artificial\n* Consultoría tecnológica\n* Consultoría Meta / WhatsApp Business API\n* Soporte técnico y mantenimiento\n\nTecnologías utilizadas:\n\n* Flutter\n* React Native\n* Node.js\n* Python\n* Tecnologías modernas escalables\n\n---\n\n## EQUIPO\n\n### Sergio Salazar\n\nAdministración, atención a clientes, marketing digital, prospectos y estrategia.\n\nTel: 5573333862\n\n### Jesús Salazar\n\nDesarrollo, implementación técnica y nuevas tecnologías.\n\nTel: 5648680084\n\n### Fernando Chávez\n\nDirector de tecnología, validación técnica y arquitectura.\n\n---\n\n## FORMA DE RESPONDER\n\n* Responde claro, profesional y breve.\n* Solo responde lo que preguntan.\n* No agregues información innecesaria.\n* Si detectas intención de compra, invita a cotizar o agendar llamada.\n* Si la pregunta está fuera del alcance, redirige con contacto humano.\n* No inventes precios fuera de los indicados.\n* No hables de política, medicina, matemáticas, tareas escolares o temas ajenos.\n\n---\n\n## TIEMPOS DE ENTREGA\n\n### Apps móviles / Web Apps\n\nNormalmente entre **4 y 6 meses**, según complejidad.\n\n### Sitios web\n\nEntre **2 semanas y 1 mes**.\n\n### Si quieren urgente\n\nSe puede acelerar bajo esquema prioritario con costo adicional.\n\n### Factores que aumentan tiempo\n\n* IA\n* Pasarelas de pago\n* APIs externas\n* Paneles administrativos complejos\n* Automatizaciones avanzadas\n\n---\n\n## PRECIOS\n\n### Sitios web\n\n* Básico: **$5,750 MXN**\n* Con integraciones: **$13,750 MXN**\n* Avanzado personalizado: **$20,000 a $30,000+ MXN**\n\nFormulario:\nhttps://sstmexico.fillout.com/t/m7uT5H3gxpus\n\nSitio:\nhttps://sstmexico.com/\n\n---\n\n### Apps móviles / Web Apps\n\nEnviar al cotizador:\n\nhttp://precioapp.sstmexico.com/\n\n---\n\n### Automatización / Agentes IA\n\nEl precio depende de:\n\n* Complejidad\n* Integraciones\n* Plataforma\n* Flujos requeridos\n\nFormulario:\nhttps://sstmexico.fillout.com/t/1yQ7u2gCXAus\n\n---\n\n### Meta / WhatsApp API / CRM\n\nPrecio personalizado según alcance.\n\nEnviar con Sergio Salazar:\n\n5573333862\n\n---\n\n## PAGOS\n\n* Transferencia bancaria\n* Parcialidades negociables\n* Anticipo inicial: **20%**\n* Cancelaciones: se cobra trabajo realizado y recursos usados\n\n---\n\n## CAMBIOS\n\nDespués de aceptar cotización:\n\n* Sí se permiten cambios\n* Pueden modificar precio\n* Pueden extender tiempos\n\n---\n\n## MANTENIMIENTO\n\nOpcional.\n\nIncluye:\n\n* Corrección de errores\n* Seguridad\n* Ajustes menores\n* Actualizaciones\n\nNo incluye nuevas funciones.\n\n---\n\n## PORTAFOLIO\n\niOS:\nhttps://apps.apple.com/mx/developer/sergio-emmanuel-salazar-cruz/id1736181306\n\nAndroid:\nhttps://play.google.com/store/apps/developer?id=SST+México&hl=es_MX\n\nWeb 3 ejemplos:\nhttps://powerdancemx.com.mx/\nhttps://sstmexico.com\nhttps://htfgym.com/\n\nCotizador:\nhttp://precioapp.sstmexico.com/\n\n---\n\n## UBICACIÓN\n\nGoogle Maps:\n\nhttps://g.co/kgs/oJ2wYdG\n\n---\n\n## SOPORTE\n\nContacto:\n\nSergio Salazar\n5573333862\n\nJesús Salazar\n5648680084\n\nCorreo: [contacto@sstmexico.com](mailto:contacto@sstmexico.com)\n\n---\n\n## AGENDAR CITAS\n\nSi el usuario quiere cita, primero pide:\n\n1. Nombre completo\n2. Motivo de reunión\n3. Descripción breve\n4. Fecha deseada\n5. Hora deseada\n\nLuego usa calendar tool.\n\n---\n\n## FUERA DE ALCANCE\n\nSi preguntan algo no relacionado con servicios SST México responde:\n\n\"No tengo permitido responder esa consulta ya que no corresponde a nuestros servicios. Para mayor orientación contáctanos:\n\nSergio Salazar: 5573333862\nJesús Salazar: 5648680084\"\n\n---\n\n## CIERRE COMERCIAL\n\nSi notas interés real:\n\n\"Con gusto podemos ayudarte. Si deseas, puedo orientarte para cotizar tu proyecto o agendar una llamada.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1176,
+        96
+      ],
+      "id": "040c8164-1dcf-4b12-af50-71d410f336ac",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1104,
+        320
+      ],
+      "id": "97e18522-a78a-4fd4-a68c-0357385ed4d9",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "=+52{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id.slice(-10) }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        96
+      ],
+      "id": "5f955f47-dd43-43d6-9bfb-fad754ced2a8",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "18dcc870-da80-47ef-af5a-f13c85ddfdfb",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ErzUrRpVp7n8dZ8H",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": []
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3248,
+        216
+      ],
+      "id": "c65af1d4-22a3-45ac-918c-8f234bd51fad",
+      "name": "WhatsApp Trigger",
+      "webhookId": "956576c7-7130-4458-97c5-c128d923266c",
+      "notesInFlow": false,
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "HyxkeZv6ktNAp1Yw",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8e16729e-1b67-4751-8b88-c20e195c4ba8",
+              "leftValue": "={{ $json.condition }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2576,
+        216
+      ],
+      "id": "6bb0b37b-020a-45c8-b8b8-a8806ba2ebca",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        384
+      ],
+      "id": "057bd086-4cbf-4b8f-9cce-48abf77f7dd0",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "12197570-4c9e-4c29-b861-bfc174543afa"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9c758c00-33e3-45dd-b975-2cdfa1002f62",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "button",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a9b1eaab-7076-4ef3-bea6-27c247520d53",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f62f7fab-4a0d-47ae-a0a7-f2a98515e6c6",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2a8bad2a-ca7e-4f5d-8169-5b7dbcace4bc",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2352,
+        48
+      ],
+      "id": "9cba78f4-3b0a-4f5f-b4bc-b803a7803ba4",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $('WhatsApp Trigger').item.json.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        168
+      ],
+      "id": "0dc3ac6f-c6f2-4f34-969b-b1bc884e34e2",
+      "name": "WhatsApp Business Cloud1",
+      "webhookId": "ccf16b0e-4029-4744-a006-8bebe3db64d3",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ErzUrRpVp7n8dZ8H",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1904,
+        168
+      ],
+      "id": "1ac4d960-a79f-4503-9120-5a67a576a4ce",
+      "name": "HTTP Download",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ErzUrRpVp7n8dZ8H",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepgram.com/v1/listen",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "{\n  \"model\": \"nova-2-general\",\n  \"language\": \"es\",\n  \"punctuate\": true,\n  \"smart_format\": true,\n  \"diarize\": true,\n  \"detect_language\": false,\n  \"numerals\": true\n}\n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Token e02354d3605950beff932cec47417832a8b460f8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "audio/opus"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1680,
+        168
+      ],
+      "id": "c231f57b-7b17-4b03-8d2a-feb1b66cc50f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "604810a7-59ad-4c4a-a9d7-aa27d56c9f4d",
+              "name": "type",
+              "value": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+              "type": "string"
+            },
+            {
+              "id": "a414d88b-5a0e-4071-a7c7-7a17242997fc",
+              "name": "mensaje",
+              "value": "={{ $if($('WhatsApp Trigger').item.json.messages[0].type!=\"text\", $('HTTP Request').item.json.results.channels[0].alternatives[0].transcript, $('WhatsApp Trigger').item.json.messages[0].text.body) }}\n",
+              "type": "string"
+            },
+            {
+              "id": "02faa4ba-b80d-4ba1-8ebf-784881f619c3",
+              "name": "nombre_remitente",
+              "value": "={{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}\n\n",
+              "type": "string"
+            },
+            {
+              "id": "3e935cf6-1811-433b-93ef-511cc4f2a468",
+              "name": "numero_remitente",
+              "value": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\n",
+              "type": "string"
+            },
+            {
+              "id": "5144c67d-eb6d-4b9b-933b-7e178e223d26",
+              "name": "numero_agent",
+              "value": "={{ $('WhatsApp Trigger').item.json.metadata.display_phone_number }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1456,
+        96
+      ],
+      "id": "799a0ef7-d14c-4469-9b57-3d39021cbc6f",
+      "name": "condicional"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "conversaciones",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "=52{{ $json.contacts[0].wa_id.substring(3) }}_{{ $json.metadata.display_phone_number }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -3024,
+        216
+      ],
+      "id": "253c5878-a15f-465b-a278-ae4d88f78835",
+      "name": "Supabase",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Verifica si no hay conversación: \n// - sin items, o \n// - el único item es un objeto vacío (sin propiedades)\nconst noConversation = items.length === 0 || \n    (items.length === 1 && Object.keys(items[0].json).length === 0);\n\n// Si hay conversación real, verifica que esté activa\nconst isActive = items.length > 0 && \n    items[0]?.json?.isActive === true;\n\nconst condition = noConversation || isActive;\n\nreturn [{ json: { condition } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2800,
+        216
+      ],
+      "id": "93791178-c88a-48ed-b994-3b4c35305471",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "=sstmex.adm@gmail.com",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "useDefaultReminders": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Use_Default_Reminders', ``, 'boolean') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -976,
+        320
+      ],
+      "id": "271b60ed-404d-4f5a-aa30-9c932b7b4ad5",
+      "name": "Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Xadd14H8cTAKLJtn",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        320
+      ],
+      "id": "7b87a3d2-0744-45df-807b-1b81e1561272",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "hdrYzQzMvwO4LvN7",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "conversaciones",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $('Edit Fields').item.json.id_conversacion }}"
+            },
+            {
+              "fieldId": "numero_waba_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.numero_waba_id }}"
+            },
+            {
+              "fieldId": "agente_ia_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.agente_ia_id }}"
+            },
+            {
+              "fieldId": "cliente",
+              "fieldValue": "={{ $('Edit Fields').item.json.name_user.replace(/\\r?\\n|\\r/g, '') }}"
+            },
+            {
+              "fieldId": "agente",
+              "fieldValue": "={{ $workflow.name }}"
+            },
+            {
+              "fieldId": "isActive",
+              "fieldValue": "={{ true }}"
+            },
+            {
+              "fieldId": "Id_waba_agent",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        128,
+        0
+      ],
+      "id": "fb8fc9c4-4346-44d4-b3ea-6ef567dbae61",
+      "name": "Create conversation",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "conversaciones",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.id_conversacion }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        96
+      ],
+      "id": "f412d8a6-683e-47bb-9a21-fa2f25dd6a86",
+      "name": "GET id_Conversation",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "acffd096-6a3c-4359-95d4-bb87090b4d5c",
+              "name": "id_conversacion",
+              "value": "={{ $json.contacts[0].input }}_{{ $('condicional').item.json.numero_agent }}",
+              "type": "string"
+            },
+            {
+              "id": "1581ac48-de1a-492b-b243-728655228d51",
+              "name": "numero_waba_id",
+              "value": "={{ $('condicional').item.json.numero_agent }}",
+              "type": "string"
+            },
+            {
+              "id": "8218588d-48e9-4155-8f6b-08976c71d975",
+              "name": "agente_ia_id",
+              "value": "={{ $workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4eba6cb4-e7f8-4c97-8890-33af9735882c",
+              "name": "name_user",
+              "value": "={{ $('condicional').item.json.nombre_remitente }}",
+              "type": "string"
+            },
+            {
+              "id": "b597b4c1-8f55-4f71-83ed-553de20db4af",
+              "name": "user_message_audio",
+              "value": "={{ $('condicional').item.json.mensaje }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        96
+      ],
+      "id": "867845df-d668-4a72-9766-09e2d86d1ce0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8900090b-3071-404f-8725-be70b3e6aebf",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": "=0",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        96
+      ],
+      "id": "19ba4cb8-ac93-4ad0-94c9-744bf69fe30b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "tableId": "mensajes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ [...Array(16)].map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('') }}\n"
+            },
+            {
+              "fieldId": "conversacion_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.id_conversacion }}"
+            },
+            {
+              "fieldId": "remitente",
+              "fieldValue": "={{ $('Edit Fields').item.json.agente_ia_id }}"
+            },
+            {
+              "fieldId": "contenido",
+              "fieldValue": "={{ $('If1').item.json.respuesta }}{{ $('AI Agent').item.json.output }}"
+            },
+            {
+              "fieldId": "sender_type",
+              "fieldValue": "bot"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        576,
+        0
+      ],
+      "id": "ade5a642-1199-419b-9a38-9d5bb40c6860",
+      "name": "bot_message_inicial",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "mensajes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ [...Array(16)].map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('') }}\n"
+            },
+            {
+              "fieldId": "conversacion_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "remitente",
+              "fieldValue": "={{ $('Edit Fields').item.json.name_user.replace(/\\r?\\n|\\r/g, '') }}"
+            },
+            {
+              "fieldId": "contenido",
+              "fieldValue": "={{ $('Edit Fields').item.json.user_message_audio }}"
+            },
+            {
+              "fieldId": "sender_type",
+              "fieldValue": "cliente"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "ef14e6e4-ca64-46c9-8307-a38a1f01963b",
+      "name": "user_message_inicial",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "mensajes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ [...Array(16)].map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('') }}\n"
+            },
+            {
+              "fieldId": "conversacion_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "remitente",
+              "fieldValue": "={{ $('Edit Fields').item.json.name_user.replace(/\\r?\\n|\\r/g, '') }}"
+            },
+            {
+              "fieldId": "contenido",
+              "fieldValue": "={{ $('Edit Fields').item.json.user_message_audio }}"
+            },
+            {
+              "fieldId": "sender_type",
+              "fieldValue": "cliente"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        128,
+        192
+      ],
+      "id": "99288843-7b14-49b0-be20-27bd90c23143",
+      "name": "cliente_message",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "mensajes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ [...Array(16)].map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('') }}\n"
+            },
+            {
+              "fieldId": "conversacion_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.id_conversacion }}"
+            },
+            {
+              "fieldId": "remitente",
+              "fieldValue": "={{ $('Edit Fields').item.json.agente_ia_id }}"
+            },
+            {
+              "fieldId": "contenido",
+              "fieldValue": "={{ $('If1').item.json.respuesta }}{{ $('AI Agent').item.json.output }}"
+            },
+            {
+              "fieldId": "sender_type",
+              "fieldValue": "bot"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        352,
+        192
+      ],
+      "id": "15df9378-35b1-485e-b12c-e948be8003d8",
+      "name": "bot_message",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "mensajes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ [...Array(16)].map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.charAt(Math.floor(Math.random() * 62))).join('') }}\n"
+            },
+            {
+              "fieldId": "conversacion_id",
+              "fieldValue": "={{ $('Supabase').item.json.id }}"
+            },
+            {
+              "fieldId": "remitente",
+              "fieldValue": "={{ $('Supabase').item.json.cliente }}"
+            },
+            {
+              "fieldId": "contenido",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}"
+            },
+            {
+              "fieldId": "sender_type",
+              "fieldValue": "cliente"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2352,
+        384
+      ],
+      "id": "afc3ae4b-31b8-4c77-b744-50cf3f0b3749",
+      "name": "cliente_message1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5N5HgkdmaNcuRz0s",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "WhatsApp Trigger": [
+      {
+        "json": {
+          "messaging_product": "whatsapp",
+          "metadata": {
+            "display_phone_number": "5215648680084",
+            "phone_number_id": "1041139959089092"
+          },
+          "contacts": [
+            {
+              "profile": {
+                "name": "Jesús Salazar"
+              },
+              "wa_id": "5215612958575",
+              "user_id": "MX.2885316758474925"
+            }
+          ],
+          "messages": [
+            {
+              "from": "5215612958575",
+              "from_user_id": "MX.2885316758474925",
+              "id": "wamid.HBgNNTIxNTYxMjk1ODU3NRUCABIYIEFDQUZFOEFGMjFFRjdBMUE3NkU5MzREQzcxOEUxRkZEAA==",
+              "timestamp": "1776795032",
+              "text": {
+                "body": "Hola"
+              },
+              "type": "text"
+            }
+          ],
+          "field": "messages"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cliente_message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "condicional",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "condicional",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "WhatsApp Business Cloud1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Business Cloud1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Download": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "condicional",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "condicional": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Business Cloud": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET id_Conversation": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create conversation": {
+      "main": [
+        [
+          {
+            "node": "user_message_inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create conversation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cliente_message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "GET id_Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "user_message_inicial": {
+      "main": [
+        [
+          {
+            "node": "bot_message_inicial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cliente_message": {
+      "main": [
+        [
+          {
+            "node": "bot_message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "bot_message": {
+      "main": [
+        []
+      ]
+    },
+    "cliente_message1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0c6f5e78-eaa3-41f7-ba69-518705ae5cfb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fab9f3ff2b7568fc6571b1133cdeedbc6f1cec20202daf1c2e3e5f0a179f140a"
+  },
+  "id": "iHlOD0cCbfNrOyt6",
+  "tags": []
+}

@@ -4,9 +4,39 @@
  */
 
 import { supabase } from './supabase'
-import { TABLES, CONVERSATION_FIELDS, MESSAGE_FIELDS, SENDER_TYPES, detectSenderType } from './constants'
+import { TABLES, CONVERSATION_FIELDS, MESSAGE_FIELDS, SENDER_TYPES } from './constants'
 import type { Conversation } from '@/types/conversation'
-import type { Message, SenderType } from '@/types/message'
+import type { Message } from '@/types/message'
+
+// Helper to get unread count from localStorage
+function getUnreadCountFromStorage(conversationId: string): number {
+  if (typeof window === 'undefined') return 0
+  const key = `unread_${conversationId}`
+  const stored = localStorage.getItem(key)
+  return stored ? parseInt(stored, 10) : 0
+}
+
+// Helper to set unread count in localStorage
+export function setUnreadCount(conversationId: string, count: number): void {
+  if (typeof window === 'undefined') return
+  const key = `unread_${conversationId}`
+  if (count <= 0) {
+    localStorage.removeItem(key)
+  } else {
+    localStorage.setItem(key, count.toString())
+  }
+}
+
+// Helper to increment unread count
+export function incrementUnreadCount(conversationId: string): void {
+  const current = getUnreadCountFromStorage(conversationId)
+  setUnreadCount(conversationId, current + 1)
+}
+
+// Helper to clear unread count (mark as read)
+export function clearUnreadCount(conversationId: string): void {
+  setUnreadCount(conversationId, 0)
+}
 
 // Conversation operations
 export const conversationService = {
@@ -22,7 +52,12 @@ export const conversationService = {
     if (error) {
       throw error
     }
-    return data || []
+
+    // Add unread count from localStorage
+    return (data || []).map(conv => ({
+      ...conv,
+      unread_count: getUnreadCountFromStorage(conv.id)
+    }))
   },
 
   /**
@@ -33,46 +68,6 @@ export const conversationService = {
       .from(TABLES.CONVERSACIONES)
       .select('*')
       .eq(CONVERSATION_FIELDS.ID, id)
-      .single()
-
-    if (error) {
-      throw error
-    }
-    return data
-  },
-
-  /**
-   * Fetch conversation by WhatsApp ID
-   */
-  async getByWaId(waId: string): Promise<Conversation | null> {
-    const { data, error } = await supabase
-      .from(TABLES.CONVERSACIONES)
-      .select('*')
-      .eq(CONVERSATION_FIELDS.WA_ID, waId)
-      .single()
-
-    if (error) {
-      // If not found, return null instead of throwing
-      return null
-    }
-    return data
-  },
-
-  /**
-   * Create a new conversation
-   */
-  async create(cliente: string, telefono: string, waId: string): Promise<Conversation> {
-    const { data, error } = await supabase
-      .from(TABLES.CONVERSACIONES)
-      .insert({
-        [CONVERSATION_FIELDS.ID]: crypto.randomUUID(),
-        [CONVERSATION_FIELDS.CLIENTE]: cliente,
-        [CONVERSATION_FIELDS.TELEFONO]: telefono,
-        [CONVERSATION_FIELDS.WA_ID]: waId,
-        [CONVERSATION_FIELDS.AGENTE]: 'agente', // default agent
-        [CONVERSATION_FIELDS.IS_ACTIVE]: true,
-      })
-      .select()
       .single()
 
     if (error) {
@@ -124,74 +119,7 @@ export const messageService = {
         [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
         [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
         [MESSAGE_FIELDS.REMITENTE]: SENDER_TYPES.AGENTE,
-        sender_type: SENDER_TYPES.AGENTE, // NEW: explicit sender_type for scalable UI
-        [MESSAGE_FIELDS.CONTENIDO]: content,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      throw error
-    }
-    return data
-  },
-
-  /**
-   * Receive a message (incoming from client or bot)
-   */
-  async receive(conversationId: string, content: string, remitente: string = SENDER_TYPES.CLIENTE): Promise<Message> {
-    const senderType = detectSenderType(remitente)
-    const { data, error } = await supabase
-      .from(TABLES.MENSAJES)
-      .insert({
-        [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
-        [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
-        [MESSAGE_FIELDS.REMITENTE]: remitente,
-        sender_type: senderType,
-        [MESSAGE_FIELDS.CONTENIDO]: content,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      throw error
-    }
-    return data
-  },
-
-  /**
-   * Send a message from a bot (automated response)
-   */
-  async sendBotMessage(conversationId: string, content: string, botName: string = 'FAQs'): Promise<Message> {
-    const { data, error } = await supabase
-      .from(TABLES.MENSAJES)
-      .insert({
-        [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
-        [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
-        [MESSAGE_FIELDS.REMITENTE]: botName,
-        sender_type: SENDER_TYPES.BOT,
-        [MESSAGE_FIELDS.CONTENIDO]: content,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      throw error
-    }
-    return data
-  },
-
-  /**
-   * Send a system message (welcome, alerts, etc.)
-   */
-  async sendSystemMessage(conversationId: string, content: string): Promise<Message> {
-    const { data, error } = await supabase
-      .from(TABLES.MENSAJES)
-      .insert({
-        [MESSAGE_FIELDS.ID]: crypto.randomUUID(),
-        [MESSAGE_FIELDS.CONVERSACION_ID]: conversationId,
-        [MESSAGE_FIELDS.REMITENTE]: 'Sistema',
-        sender_type: SENDER_TYPES.SISTEMA,
+        sender_type: SENDER_TYPES.AGENTE,
         [MESSAGE_FIELDS.CONTENIDO]: content,
       })
       .select()

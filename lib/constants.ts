@@ -14,7 +14,6 @@ export const CONVERSATION_FIELDS = {
   ID: 'id',
   CLIENTE: 'cliente',
   TELEFONO: 'telefono',
-  WA_ID: 'wa_id',
   AGENTE: 'agente',
   IMG: 'img',
   IS_ACTIVE: 'isActive',

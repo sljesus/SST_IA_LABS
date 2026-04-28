@@ -8,4 +8,5 @@ export interface Conversation {
   agente: string;
   img?: string;
   Id_waba_agent?: string;
+  unread_count?: number;
 }

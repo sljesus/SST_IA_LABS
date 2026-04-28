@@ -4,17 +4,21 @@ import { useEffect, useState, useRef } from 'react'
 import { Conversation } from '@/types/conversation'
 import { Message, SenderType } from '@/types/message'
 
-import { messageService, realtimeService } from '@/lib/db'
+import { messageService, realtimeService, incrementUnreadCount, setUnreadCount } from '@/lib/db'
 import { supabase } from '@/lib/supabase'
 import { SENDER_TYPES, isAgentMessage, detectSenderType } from '@/lib/constants'
+import { isDocumentHidden } from '@/lib/notifications'
+import NotificationToast from './NotificationToast'
 
 interface Props {
   conversation: Conversation | null
   onBack?: () => void
   hasSelectedConversation?: boolean
+  onNewMessageFromOther?: (conversation: Conversation, messagePreview: string) => void
+  onConversationToggle?: (conversationId: string, isActive: boolean) => void
 }
 
-export default function ChatWindow({ conversation, onBack, hasSelectedConversation }: Props) {
+export default function ChatWindow({ conversation, onBack, hasSelectedConversation, onNewMessageFromOther, onConversationToggle }: Props) {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -23,10 +27,61 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   const [showSearch, setShowSearch] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Sync aiMode when conversation changes
+  // Global subscription to detect messages from other conversations
+  useEffect(() => {
+    const channel = supabase
+      .channel('global-messages-listener')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'mensajes',
+        },
+        (payload) => {
+          const newMsg = payload.new as unknown as Message
+          if (!newMsg) return
+
+          const msgConvId = newMsg.conversacion_id
+          
+          // Only process if this is NOT the current selected conversation
+          if (conversation && msgConvId !== conversation.id) {
+            // Check if it's a customer message (not from agent)
+            const senderType = newMsg.sender_type ?? detectSenderType(newMsg.remitente)
+            const isFromCustomer = senderType === SENDER_TYPES.CLIENTE
+
+            if (isFromCustomer && onNewMessageFromOther) {
+              // Get conversation data from the message's conversation_id
+              const preview = newMsg.contenido.length > 50 
+                ? newMsg.contenido.substring(0, 50) + '...' 
+                : newMsg.contenido
+              
+              // Create a minimal conversation object for the toast
+              const convForToast: Conversation = {
+                id: msgConvId,
+                cliente: 'Cliente', // Will be filled by parent
+                isActive: false,
+                creado_en: newMsg.creado_en,
+                agente: '',
+              }
+
+              onNewMessageFromOther(convForToast, preview)
+            }
+          }
+        }
+      )
+
+    channel.subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [conversation, onNewMessageFromOther])
+
+  // Sync aiMode cuando cambia de conversación — asegurar header correcto
   useEffect(() => {
     setAiMode(conversation?.isActive ?? false)
-  }, [conversation?.isActive])
+  }, [conversation?.id, conversation?.isActive])
 
   // Realtime subscription for conversation changes
   useEffect(() => {
@@ -126,22 +181,26 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
     if (!conversation) return
 
     const newMode = !aiMode
+    console.log('[ChatWindow] toggleAiMode:', conversation.id, conversation.cliente, '->', newMode)
     setAiMode(newMode)
 
     try {
-      const response = await fetch('/api/conversations/toggle', {
+      const res = await fetch('/api/conversations/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ conversationId: conversation.id, isActive: newMode })
       })
-
-      if (!response.ok) {
-        // Revert on error
+      
+      console.log('[ChatWindow] toggleAiMode response:', res.status, res.statusText)
+      if (res.ok) {
+        console.log('[ChatWindow] toggleAiMode OK — calling callback')
+        onConversationToggle?.(conversation.id, newMode)
+      } else {
+        console.log('[ChatWindow] toggleAiMode FALLO — revertiendo')
         setAiMode(!newMode)
       }
-    } catch (error) {
-      console.error('Error toggling AI mode:', error)
-      // Revert on error
+    } catch (err) {
+      console.log('[ChatWindow] toggleAiMode error:', err, '— revertiendo')
       setAiMode(!newMode)
     }
   }

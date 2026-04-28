@@ -3,62 +3,89 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Conversation } from '@/types/conversation'
 import { useTheme } from '@/components/theme/ThemeProvider'
-import { conversationService, realtimeService } from '@/lib/db'
+import { conversationService, realtimeService, clearUnreadCount } from '@/lib/db'
+import { updateDocumentTitle } from '@/lib/notifications'
 import { supabase } from '@/lib/supabase'
 import { CONVERSATION_FIELDS } from '@/lib/constants'
 
 interface SidebarProps {
+  conversations?: Conversation[]
+  isLoading?: boolean
   selectedConversation: Conversation | null
   onSelectConversation: (conv: Conversation) => void
+  onRefresh?: () => Promise<void>
 }
 
-export default function Sidebar({ selectedConversation, onSelectConversation }: SidebarProps) {
+export default function Sidebar({ 
+  conversations: propConversations,
+  isLoading: propIsLoading,
+  selectedConversation, 
+  onSelectConversation,
+  onRefresh 
+}: SidebarProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [localConversations, setLocalConversations] = useState<Conversation[]>([])
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { theme, toggleTheme, mounted } = useTheme()
   const isDarkMode = theme === 'dark'
 
-  // Fetch conversations from the service
-  const fetchConversations = async (isSilent = false) => {
-    if (!isSilent) {
-      setError(null)
-    }
-    try {
-      const data = await conversationService.getAll()
-      setConversations(data)
-    } catch (err: unknown) {
-      console.error('Error fetching conversations:', err)
-      if (!isSilent) {
-        setError(err instanceof Error ? err.message : 'Error al cargar conversaciones')
-      }
-    } finally {
-      if (!isSilent) {
+  const conversations = propConversations ?? localConversations
+  const isLoading = propIsLoading ?? isInitialLoading
+
+  // Solo hacer fetch local si no nos pasan conversaciones (no usar array vacío)
+  useEffect(() => {
+    if (propConversations && propConversations.length > 0) return
+    
+    const fetchLocal = async () => {
+      try {
+        const data = await conversationService.getAll()
+        setLocalConversations(data)
+      } catch (err) {
+        console.error('Error fetching conversations:', err)
+      } finally {
         setIsInitialLoading(false)
       }
     }
-  }
+    
+    fetchLocal()
 
-  useEffect(() => {
-    fetchConversations(false) // Initial load with loading state
-
-    // Realtime subscription for conversations
     const channel = realtimeService.onConversationsChange(() => {
-      // Silent refresh - no loading spinner
-      fetchConversations(true)
+      if (onRefresh) {
+        onRefresh()
+      } else {
+        fetchLocal()
+      }
     })
     channel.subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [])
+  }, [propConversations, onRefresh])
 
   // Instant toggle with direct DOM manipulation
   const handleToggle = () => {
     document.documentElement.classList.toggle('dark')
     toggleTheme()
+  }
+
+  // Update document title based on total unread count
+  useEffect(() => {
+    const totalUnread = conversations.reduce((total, conv) => total + (conv.unread_count || 0), 0)
+    updateDocumentTitle(totalUnread)
+  }, [conversations])
+
+  // Handler to select conversation and clear unread
+  const handleSelectConversation = (conv: Conversation) => {
+    clearUnreadCount(conv.id)
+    if (!propConversations || propConversations.length === 0) {
+      const updated = localConversations.map(c => 
+        c.id === conv.id ? { ...c, unread_count: 0 } : c
+      )
+      setLocalConversations(updated)
+    }
+    onSelectConversation(conv)
   }
 
   // Dynamic styles based on theme
@@ -150,10 +177,9 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
               <div className="flex flex-col items-center justify-center py-8">
                 <span className="material-symbols-outlined text-3xl" style={{ color: '#ef4444' }}>error</span>
                 <p className="mt-2 text-sm text-center" style={{ color: '#ef4444' }}>{error}</p>
-                <button 
-                  onClick={() => fetchConversations(false)}
+<button 
+                  onClick={() => onRefresh?.()}
                   className="mt-3 px-4 py-2 rounded-lg text-sm font-medium"
-                  style={{ backgroundColor: isDarkMode ? '#3de273' : '#006d2f', color: isDarkMode ? '#000' : '#fff' }}
                 >
                   Reintentar
                 </button>
@@ -166,10 +192,10 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
                 </p>
               </div>
             ) : (
-              filteredConversations.map(conv => (
+filteredConversations.map(conv => (
                 <div
                   key={conv.id}
-                  onClick={() => onSelectConversation(conv)}
+                  onClick={() => handleSelectConversation(conv)}
                   className="flex items-center p-3 cursor-pointer rounded-lg border-l-4 transition-colors duration-200"
                   style={{ 
                     backgroundColor: selectedConversation?.id === conv.id 
@@ -179,30 +205,37 @@ export default function Sidebar({ selectedConversation, onSelectConversation }: 
                       ? (isDarkMode ? '#3de273' : '#006d2f') 
                       : 'transparent'
                   }}
-              >
-                {conv.img ? (
-                  <img
-                    alt={`${conv.cliente} Profile`}
-                    className="w-10 h-10 rounded-full mr-3 object-cover"
-                    src={conv.img}
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full mr-3 flex items-center justify-center" style={{ backgroundColor: isDarkMode ? '#44474a' : '#e0e3e6' }}>
-                    <span className="material-symbols-outlined text-sm" style={{ color: isDarkMode ? '#c4c7ca' : '#626567' }}>group</span>
+                >
+                  <div className="relative">
+                    {conv.img ? (
+                      <img
+                        alt={`${conv.cliente} Profile`}
+                        className="w-10 h-10 rounded-full mr-3 object-cover"
+                        src={conv.img}
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full mr-3 flex items-center justify-center" style={{ backgroundColor: isDarkMode ? '#44474a' : '#e0e3e6' }}>
+                        <span className="material-symbols-outlined text-sm" style={{ color: isDarkMode ? '#c4c7ca' : '#626567' }}>group</span>
+                      </div>
+                    )}
+                    {(conv.unread_count || 0) > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold text-white bg-red-500 px-1">
+                        {(conv.unread_count || 0) > 99 ? '99+' : conv.unread_count}
+                      </span>
+                    )}
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-baseline mb-0.5">
-                    <h3 className="font-semibold truncate text-sm" style={{ color: isDarkMode ? '#e5e7eb' : '#131d23' }}>
-                      {conv.cliente}
-                    </h3>
-                    <span className="text-xs" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>{formatTime(conv.creado_en)}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-baseline mb-0.5">
+                      <h3 className="font-semibold truncate text-sm" style={{ color: isDarkMode ? '#e5e7eb' : '#131d23' }}>
+                        {conv.cliente}
+                      </h3>
+                      <span className="text-xs" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>{formatTime(conv.creado_en)}</span>
+                    </div>
+                    <p className="text-xs truncate" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>
+                      Agente: {conv.agente || 'Sin agente'}
+                    </p>
                   </div>
-                  <p className="text-xs truncate" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>
-                    Agente: {conv.agente || 'Sin agente'}
-                  </p>
                 </div>
-              </div>
               ))
             )}
           </div>
