@@ -152,7 +152,7 @@ export default function WhatsAppPage() {
   }, [handleSelectConversation])
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: isDarkMode ? '#0b1418' : '#f3f4f6' }}>
+    <div className="flex h-screen overflow-hidden bg-[#f3f4f6] dark:bg-[#0b1418]">
       {/* Sidebar - responsivo */}
       <div className={`
         ${showSidebar ? 'translate-x-0' : '-translate-x-full'}
@@ -181,10 +181,9 @@ export default function WhatsAppPage() {
         {!selectedConversation && (
           <button
             onClick={() => setShowSidebar(true)}
-            className="absolute top-4 left-4 z-20 p-2 rounded-lg lg:hidden"
-            style={{ backgroundColor: isDarkMode ? '#1c282e' : '#ffffff' }}
+            className="absolute top-4 left-4 z-20 p-2 rounded-lg lg:hidden bg-[#ffffff] dark:bg-[#1c282e]"
           >
-            <span className="material-symbols-outlined" style={{ color: textColor(isDarkMode) }}>
+            <span className="material-symbols-outlined text-[#111827] dark:text-[#e5e7eb]">
               menu
             </span>
           </button>
