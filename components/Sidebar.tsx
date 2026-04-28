@@ -7,6 +7,7 @@ import { conversationService, realtimeService, clearUnreadCount } from '@/lib/db
 import { updateDocumentTitle } from '@/lib/notifications'
 import { supabase } from '@/lib/supabase'
 import { CONVERSATION_FIELDS } from '@/lib/constants'
+import { useRouter } from 'next/navigation'
 
 interface SidebarProps {
   conversations?: Conversation[]
@@ -29,6 +30,14 @@ export default function Sidebar({
   const [error, setError] = useState<string | null>(null)
   const { theme, toggleTheme, mounted } = useTheme()
   const isDarkMode = theme === 'dark'
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    if (confirm('¿Cerrar sesión?')) {
+      await supabase.auth.signOut()
+      router.push('/login')
+    }
+  }
 
   const conversations = propConversations ?? localConversations
   const isLoading = propIsLoading ?? isInitialLoading
@@ -257,6 +266,7 @@ filteredConversations.map(conv => (
             <button 
               className="flex-1 flex items-center justify-center py-3 cursor-pointer rounded-lg transition-colors duration-200"
               style={{ color: textSecondary }}
+              onClick={handleLogout}
             >
               <span className="material-symbols-outlined mr-2" data-icon="logout">
                 logout

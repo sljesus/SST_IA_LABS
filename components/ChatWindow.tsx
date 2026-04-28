@@ -25,6 +25,7 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   const [aiMode, setAiMode] = useState(conversation?.isActive ?? false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Global subscription to detect messages from other conversations
@@ -82,6 +83,23 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   useEffect(() => {
     setAiMode(conversation?.isActive ?? false)
   }, [conversation?.id, conversation?.isActive])
+
+  // Cerrar menú al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (showMenu && !target.closest('.menu-dropdown')) {
+        setShowMenu(false)
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [showMenu])
+
+  // Cerrar menú al cambiar de conversación
+  useEffect(() => {
+    setShowMenu(false)
+  }, [conversation?.id])
 
   // Realtime subscription for conversation changes
   useEffect(() => {
@@ -272,7 +290,63 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
             >
               search
             </button>
-            <span className="material-symbols-outlined cursor-pointer text-[var(--color-on-surface-variant)]">more_vert</span>
+            <div className="relative menu-dropdown">
+              <button 
+                type="button"
+                className="material-symbols-outlined cursor-pointer text-[var(--color-on-surface-variant)]"
+                onClick={() => setShowMenu(!showMenu)}
+                title="Más opciones"
+              >
+                more_vert
+              </button>
+              {showMenu && (
+                <div className="absolute right-0 top-8 w-48 py-2 rounded-lg shadow-lg bg-[var(--color-surface-container)] border border-[var(--color-outline-variant)] z-50">
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--color-surface-container-low)] flex items-center gap-2"
+                    onClick={() => {
+                      if (confirm('¿Eliminar todos los mensajes de esta conversación?')) {
+                        // TODO: implementar eliminación de mensajes
+                        alert('Función en desarrollo')
+                      }
+                      setShowMenu(false)
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                    Eliminar mensajes
+                  </button>
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--color-surface-container-low)] flex items-center gap-2"
+                    onClick={() => {
+                      // Descargar conversación como texto
+                      const text = messages.map(m => 
+                        `${m.remitente}: ${m.contenido}`
+                      ).join('\n')
+                      const blob = new Blob([text], { type: 'text/plain' })
+                      const url = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = `chat-${conversation?.cliente || 'conversacion'}.txt`
+                      a.click()
+                      URL.revokeObjectURL(url)
+                      setShowMenu(false)
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-sm">download</span>
+                    Descargar chat
+                  </button>
+                  <button 
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--color-surface-container-low)] flex items-center gap-2"
+                    onClick={() => {
+                      alert(`ID de conversación: ${conversation?.id}`)
+                      setShowMenu(false)
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-sm">info</span>
+                    Info de contacto
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         {/* Solo íconos en mobile */}
@@ -284,7 +358,13 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
           >
             search
           </button>
-          <span className="material-symbols-outlined p-2 cursor-pointer text-[var(--color-on-surface-variant)]">more_vert</span>
+          <button 
+            type="button"
+            className="material-symbols-outlined p-2 cursor-pointer text-[var(--color-on-surface-variant)]"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            more_vert
+          </button>
         </div>
       </div>
 
