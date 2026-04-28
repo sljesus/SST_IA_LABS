@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -33,7 +33,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={`${inter.variable} font-body-base dark`}>
+      <body className={`${inter.variable} font-body-base`}>
         <AuthProvider>
           <ThemeProvider>
             {children}

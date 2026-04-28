@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Conversation } from '@/types/conversation'
 import { Message } from '@/types/message'
+import { useTheme } from '@/components/theme/ThemeProvider'
 
 interface Props {
   conversation: Conversation | null
@@ -14,6 +15,17 @@ export default function ChatArea({ conversation }: Props) {
   const [newMessage, setNewMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // Theme-aware colors (same pattern as Sidebar)
+  const { theme } = useTheme()
+  const isDarkMode = theme === 'dark'
+  const chatBg = isDarkMode ? '#0b1013' : '#E5DDD5'
+  const surfaceContainer = isDarkMode ? '#1c282e' : '#ffffff'
+  const surfaceContainerLow = isDarkMode ? '#181f23' : '#ffffff'
+  const textPrimary = isDarkMode ? '#e1e9ed' : '#131d23'
+  const textSecondary = isDarkMode ? '#bccbb9' : '#3c4a3d'
+  const borderColor = isDarkMode ? '#44474a' : '#e5e7eb'
+  const chatReceived = isDarkMode ? '#1e2830' : '#ffffff'
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -120,13 +132,13 @@ export default function ChatArea({ conversation }: Props) {
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-chat-background dark:bg-[#0b1013]">
+      <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: chatBg }}>
         <div className="text-center">
           <div className="text-6xl mb-4">💬</div>
-          <h3 className="text-xl font-medium text-secondary-700 dark:text-gray-300 mb-2">
+          <h3 className="text-xl font-medium mb-2" style={{ color: textPrimary }}>
             Selecciona una conversación
           </h3>
-          <p className="text-secondary-500 dark:text-gray-400">
+          <p style={{ color: textSecondary }}>
             Elige un chat de la lista para comenzar a conversar
           </p>
         </div>
@@ -135,15 +147,15 @@ export default function ChatArea({ conversation }: Props) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-chat-background dark:bg-[#0b1013]">
+    <div className="flex-1 flex flex-col" style={{ backgroundColor: chatBg }}>
       {/* Header */}
-      <div className="bg-white dark:bg-[#1c282e] border-b border-secondary-200 dark:border-gray-700 px-6 py-4 shadow-soft">
+      <div className="px-6 py-4 shadow-soft" style={{ backgroundColor: surfaceContainer, borderBottom: `1px solid ${borderColor}` }}>
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-secondary-900 dark:text-gray-100">
+            <h2 className="text-xl font-semibold" style={{ color: textPrimary }}>
               {conversation.cliente}
             </h2>
-            <p className="text-secondary-600 dark:text-gray-400 text-sm">
+            <p className="text-sm" style={{ color: textSecondary }}>
               Agente: <span className="font-medium">{conversation.agente}</span>
             </p>
           </div>
@@ -169,10 +181,10 @@ export default function ChatArea({ conversation }: Props) {
               className={`flex ${msg.remitente === 'cliente' ? 'justify-start' : 'justify-end'}`}
             >
               <div className={`message-bubble ${
-                msg.remitente === 'cliente' ? 'message-received dark: bg-[#1e2830]' : 'message-sent'
-              }`}>
+                  msg.remitente === 'cliente' ? 'message-received' : 'message-sent'
+                }`} style={msg.remitente === 'cliente' ? { backgroundColor: chatReceived, color: textPrimary } : undefined}>
                 <p className="text-sm leading-relaxed">{msg.contenido}</p>
-                <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1 opacity-70">
+                <p className="text-xs mt-1 opacity-70" style={{ color: textSecondary }}>
                   {(() => {
                     const date = new Date(msg.creado_en)
                     const hours = date.getHours().toString().padStart(2, '0')
@@ -188,13 +200,14 @@ export default function ChatArea({ conversation }: Props) {
       </div>
 
       {/* Input Area */}
-      <div className="bg-white dark:bg-[#1c282e] border-t border-secondary-200 dark:border-gray-700 p-4">
+      <div className="p-4" style={{ backgroundColor: surfaceContainer, borderTop: `1px solid ${borderColor}` }}>
         <div className="flex space-x-3">
           <input
             value={newMessage}
             onChange={e => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="input-field flex-1 bg-white dark:bg-[#181f23] dark:text-gray-100 dark:border-gray-600"
+            className="input-field flex-1"
+            style={{ backgroundColor: surfaceContainerLow, color: textPrimary, borderColor: borderColor }}
             placeholder="Escribe un mensaje..."
             disabled={isLoading}
           />

@@ -12,6 +12,15 @@ export default function AIActiveModal({ conversationName, onLeaveAsIs, onActivat
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
 
+  // Define theme-aware colors using the same pattern as Sidebar
+  const modalBg = isDarkMode ? '#1c282e' : '#ffffff'
+  const modalBorder = isDarkMode ? '#3de273' : '#006d2f'
+  const textPrimary = isDarkMode ? '#e1e9ed' : '#131d23'
+  const textSecondary = isDarkMode ? '#bccbb9' : '#3c4a3d'
+  const buttonSecondary = isDarkMode ? '#3f4a51' : '#d9e4ec'
+  const buttonPrimary = isDarkMode ? '#3de273' : '#006d2f'
+  const buttonPrimaryText = isDarkMode ? '#003915' : '#ffffff'
+
   const handleLeaveAsIs = (e: React.MouseEvent) => {
     e.stopPropagation()
     onLeaveAsIs()
@@ -30,8 +39,8 @@ export default function AIActiveModal({ conversationName, onLeaveAsIs, onActivat
       <div 
         className="relative z-10 max-w-md w-full mx-4 p-6 rounded-xl"
         style={{ 
-          backgroundColor: '#1c282e',
-          border: '1px solid #3de273'
+          backgroundColor: modalBg,
+          border: `1px solid ${modalBorder}`
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -41,7 +50,7 @@ export default function AIActiveModal({ conversationName, onLeaveAsIs, onActivat
           </span>
           <h2 
             className="text-xl font-semibold"
-            style={{ color: '#e5e7eb' }}
+            style={{ color: textPrimary }}
           >
             IA desactivada
           </h2>
@@ -49,7 +58,7 @@ export default function AIActiveModal({ conversationName, onLeaveAsIs, onActivat
         
         <p 
           className="mb-6"
-          style={{ color: '#9ca3af' }}
+          style={{ color: textSecondary }}
         >
           No tienes el agente IA activo en esta conversación. ¿Estás seguro de que querés dejar esta conversación?
         </p>
@@ -60,8 +69,8 @@ export default function AIActiveModal({ conversationName, onLeaveAsIs, onActivat
             autoFocus
             className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-opacity hover:opacity-90"
             style={{ 
-              backgroundColor: '#374151',
-              color: '#e5e7eb'
+              backgroundColor: buttonSecondary,
+              color: textPrimary
             }}
           >
             Sí, dejar así
@@ -70,8 +79,8 @@ export default function AIActiveModal({ conversationName, onLeaveAsIs, onActivat
             onClick={handleActivateAndLeave}
             className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-opacity hover:opacity-90"
             style={{ 
-              backgroundColor: '#3de273',
-              color: '#0f172a'
+              backgroundColor: buttonPrimary,
+              color: buttonPrimaryText
             }}
           >
             Activar primero
