@@ -137,14 +137,11 @@ export default function Sidebar({
         <div className="px-6 py-4 border-b" style={{ borderColor: sidebarBorder }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img
-                alt="User Profile Avatar"
-                className="w-10 h-10 rounded-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCznmi2LZ5QSQ13UwIj63r27phRTjTPUdYeu9exSPi2T0AsiCsp_ihmdIboZdo2rpcojcnJJFL9UX03vQwz-nLFrb9S-I5B2sETPNVNT-ALqRgIhKf6M04sBpbNtAaIPCNonfZko-F33OEiJt5pjD5Gw2ozNj_OF6avOSpoas3HSKQuRPXRyvoJStzw4ArDU6AuFW38ve80OPb6AD4usLbnIIv5ov8H6XJMpS4wzbC3u1amPxM1Kn2NYBlZs_GdsdS6c9njpJRVQpw"
-              />
+              <div className="w-10 h-10 rounded-full bg-[var(--color-primary-container)] flex items-center justify-center">
+                <span className="material-symbols-outlined text-[var(--color-on-primary-container)]">store</span>
+              </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold" style={{ color: textPrimary }}>Consola del Operador</span>
-                <span className="text-xs font-medium" style={{ color: textSecondary, opacity: 0.7 }}>IA Activa</span>
+                <span className="text-xl font-bold" style={{ color: textPrimary }}>SST México</span>
               </div>
             </div>
           </div>

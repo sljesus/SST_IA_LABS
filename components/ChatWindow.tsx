@@ -240,11 +240,11 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
               </span>
             </button>
           )}
-          <img
-            alt={`${conversation.cliente} Profile`}
-            className="w-10 h-10 rounded-full mr-3 object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYhipl-64MkYs2YGyJoFGFi-x_FFXgjM4qxYQuvof8AgF9wuC3-2yznG2noUmXEmJlnMPcPaoQ-fp1uwgNewwMrmX9MQEbP04S8ySTg4Wh76sicF2Ld_3ZNaXgfud9FF9-ZdW57lCP0d2X8qhqhWsdBevCS384xSdGBF2TAaBggCXW36urC2Pn-bzqnREK1fFpDU1ULEVYmzrPU6vPtEa58tLeF2eZXPhHTNgeB_iHMDdVDqnBQEwrTBjiPicQJc5XMHDOXULbZTc"
-          />
+          <div className="w-10 h-10 rounded-full mr-3 bg-[var(--color-primary-container)] flex items-center justify-center">
+            <span className="material-symbols-outlined text-[var(--color-on-primary-container)]">
+              person
+            </span>
+          </div>
           <div>
             <h2 className="text-body-base font-semibold text-[var(--color-on-surface)]">{conversation.cliente}</h2>
           </div>
