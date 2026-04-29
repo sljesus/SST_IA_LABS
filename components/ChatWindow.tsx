@@ -26,6 +26,7 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Global subscription to detect messages from other conversations
@@ -99,7 +100,20 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
   // Cerrar menú al cambiar de conversación
   useEffect(() => {
     setShowMenu(false)
+    setShowEmojiPicker(false)
   }, [conversation?.id])
+
+  // Cerrar emoji picker al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (showEmojiPicker && !target.closest('.emoji-picker')) {
+        setShowEmojiPicker(false)
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [showEmojiPicker])
 
   // Realtime subscription for conversation changes
   useEffect(() => {
@@ -440,9 +454,53 @@ export default function ChatWindow({ conversation, onBack, hasSelectedConversati
 
       {/* Message Input Area */}
       <div className="px-6 py-4 flex items-center gap-4 shrink-0 border-t bg-[var(--color-surface-container)] border-[var(--color-outline-variant)]">
-        <div className="flex gap-4">
-          <span className="material-symbols-outlined cursor-pointer text-[var(--color-on-surface-variant)]">sentiment_satisfied</span>
-          <span className="material-symbols-outlined cursor-pointer text-[var(--color-on-surface-variant)]">attach_file</span>
+        {/* Emoji Picker */}
+        <div className="relative emoji-picker">
+          <button 
+            type="button"
+            className="material-symbols-outlined cursor-pointer text-[var(--color-on-surface-variant)]"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            title="Emojis"
+          >
+            sentiment_satisfied
+          </button>
+          {showEmojiPicker && (
+            <div className="absolute bottom-10 left-0 w-64 p-2 rounded-lg shadow-lg bg-[var(--color-surface-container)] border border-[var(--color-outline-variant)] z-50">
+              <div className="grid grid-cols-8 gap-1">
+                {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '😉', '😌', '😍', '🥰', '😘', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐'].map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    className="text-xl p-1 hover:bg-[var(--color-surface-container-low)] rounded"
+                    onClick={() => {
+                      setNewMessage(prev => prev + emoji)
+                      setShowEmojiPicker(false)
+                    }}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* File Attachment */}
+        <div className="relative">
+          <input
+            type="file"
+            id="file-input"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) {
+                alert(`Archivo seleccionado: ${file.name}\n\nFuncionalidad de envío de archivos en desarrollo.`)
+              }
+            }}
+          />
+          <label htmlFor="file-input" className="cursor-pointer">
+            <span className="material-symbols-outlined text-[var(--color-on-surface-variant)]">attach_file</span>
+          </label>
         </div>
         <div className="flex-1">
           <input
